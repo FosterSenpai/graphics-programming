@@ -27,10 +27,6 @@ GLuint program_fixed_tri; 		 // First Fixed Triangle.
 int window_height = 800;
 int window_width = 800;
 
-// Dynamic Data Globals
-GLuint program_position_only;
-GLuint vbo_tri;
-
 // ======================================================================
 // Data Structures
 // ======================================================================
@@ -142,29 +138,6 @@ void initial_setup()
 	program_fixed_tri = c_shader_loader::create_program("Resources/Shaders/FixedTriangle.vert",
 	                                                    "Resources/Shaders/FixedColor.frag");
 
-	// Generate the VBO for a Triangle
-	// todo: Still need to implement dynamic data triangle, running off static data file right now.
-	//program_position_only = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
-	//                                                        "Resources/Shaders/FixedColor.frag");
-	//std::vector<s_vertex> verticesTri;
-	//verticesTri.push_back({0.0f, 0.0f, 0.0f});
-	//verticesTri.push_back({-0.5f, 0.8f, 0.0f});
-	//verticesTri.push_back({0.5f, 0.8f, 0.0f});
-
-	// ******************
-	// Create VBO buffers
-	// ******************
-
-	glGenBuffers(1, &vbo_tri);    						// Generate a buffer object name.
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_tri);    // Bind the buffer object to the context.
-
-	/*
-	 * GlBufferData
-	 * Second argument wants the size of the data in Bytes but vector.size() is an int
-	 * I multiplied the vector.size() by the byte size of the first vertex, so the warning is fixed, dont worry about it.
-	 */
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(verticesTri[0]) * verticesTri.size(), verticesTri.data(), GL_STATIC_DRAW);
-
 	// ********************************
 	// Prepare the window for rendering
 	// ********************************
@@ -200,13 +173,21 @@ void render()
 	// Program 1: Fixed Triangle: Start
 	// --------------------------------
 	glUseProgram(program_fixed_tri);                     	    // Use the program object that was created and loaded with the shaders.
-	glDrawArrays(GL_TRIANGLES, 0, 3);           // Draw the triangle.
-	glPolygonMode(GL_FRONT, GL_FILL);                 // Draw the triangle in fill mode.
+	glDrawArrays(GL_TRIANGLES, 0, 3);           // Draw the triangle. Triangle primitive, start at 0, draw 3 vertices.
+	glPolygonMode(GL_FRONT, GL_FILL);                 // Draw the triangle in fill mode. Fill front faces of polygons.
 
-	// If the left mouse button is pressed, draw the triangle in wireframe mode.
+	// Change the polygon mode based on mouse button press.
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
-		glPolygonMode(GL_FRONT, GL_LINE);
+		glPolygonMode(GL_FRONT, GL_LINE);    // On left-click draw the triangle in line mode. Draw the outline of the triangle.
+	}
+	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	{
+		glPolygonMode(GL_FRONT, GL_POINT);   // On right-click draw the triangle in point mode. Draw the vertices of the triangle.
+	}
+	else
+	{
+		glPolygonMode(GL_FRONT, GL_FILL);    // If no mouse button is pressed, draw the triangle in fill mode. Fill front faces of polygons.
 	}
 	// ------------------------------
 	// Program 1: Fixed Triangle: End

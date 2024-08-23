@@ -72,7 +72,7 @@ GLuint c_shader_loader::create_shader(GLenum shader_type, const char* shader_nam
 	std::string shader_code = read_shader_file(shader_name);  		 // Save the shader code as a string.
 
 	// Create the shader ID and create pointers for source code string and length.
-	GLuint shader_id = glCreateShader(shader_type);					 // Create a shader object with the shader type provided.
+	GLuint shader_id = glCreateShader(shader_type);					 // Create a shader object with the enum 'shader_type' provided.
 	const char* p_shader_code = shader_code.c_str(); 				 // Create a pointer to the shader code, convert the string to a char array.
 	const int code_length = static_cast<int>(shader_code.size());    // Save the length of the shader code, need for glShaderSource so it knows how many characters to read.
 
