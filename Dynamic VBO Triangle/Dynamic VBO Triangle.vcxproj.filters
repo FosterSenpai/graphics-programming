@@ -27,4 +27,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Shaders\FixedColor.frag" />
+    <None Include="Resources\Shaders\PositionOnly.vert" />
+  </ItemGroup>
 </Project>

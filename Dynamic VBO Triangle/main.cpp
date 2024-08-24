@@ -22,10 +22,24 @@ Mail : Foster.Rae@mds.ac.nz
 // ======================================================================
 
 GLFWwindow* window = nullptr;    // Pointer to the GLFW window.
-GLuint program_fixed_tri; 		 // First Fixed Triangle.
+
+// Temporary variables for the dynamic triangle.
+GLfloat vertices_tri[] = { 0.0f, 0.0f, 0.0f,    // Vertex 1: Top
+						  -0.5f, 0.8f, 0.0f,    // Vertex 2: Bottom Right
+	                       0.5f, 0.8f, 0.0f     // Vertex 3: Bottom Left
+};
+
+GLuint program_position_only;    // Program object for the position only shader.
+GLuint vbo_tri;				     // Vertex buffer object for the triangle, can put this somewhere else.
+GLuint vao_tri;				     // Vertex array object for the triangle, needs to be global as it is used in multiple functions.
 
 int window_height = 800;
 int window_width = 800;
+
+// *************************
+// Dynamic Array of vertices
+// *************************
+
 
 // ======================================================================
 // Data Structures
@@ -54,18 +68,12 @@ int main()
 	// Initialise GLFW
 	// ***************
 
-	/*
-	 * This function must be called before any other GLFW functions are called.
-	 * It initializes the GLFW library,to version 4.6, and sets the OpenGL profile to be compatible.
-	 */
-	glfwInit();
+	glfwInit(); // Must be called before any other GLFW functions.
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	/*
-	 * Create a GLFW controlled window with a 800x800 resolution and a title of "Graphics Framework".
-	 */
-	window = glfwCreateWindow(window_width, window_height, "Graphics Framework", nullptr, nullptr);
+
+	window = glfwCreateWindow(window_width, window_height, "Graphics Framework", nullptr, nullptr); // Create a window.
 
 	if (window == nullptr) 	   		   // Check if the window was created successfully, if not terminate the program.
 	{
@@ -134,14 +142,48 @@ void initial_setup()
 	// ***********************************
 	// Load shaders, Create program object
 	// ***********************************
-
-	program_fixed_tri = c_shader_loader::create_program("Resources/Shaders/FixedTriangle.vert",
+	program_position_only = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
 	                                                    "Resources/Shaders/FixedColor.frag");
+
+	// ********************************
+	// Generate the vertex array object
+	// ********************************
+	glGenVertexArrays(1, &vao_tri);    // Generate a vertex array object name.
+	glBindVertexArray(vao_tri);          // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
+
+	// *********************************
+	// Generate the vertex buffer object
+	// *********************************
+	glGenBuffers(1, &vbo_tri);    																	   // Generate a buffer object name. This will be used to store the vertex data.
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_tri);    												   // Bind the VBO to the GL_ARRAY_BUFFER target slot.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_tri), vertices_tri, GL_STATIC_DRAW);    // Creates and initializes a buffer object's data store.
+
+	// *************************
+	// Set the vertex attributes
+	// *************************
+
+	/**
+	 * NOTE TO SELF:
+	 *
+	 * glVertexAttribPointer
+	 *
+	 * This needs to be called after creating the VBO and VAO.
+	 * When this is called its binding the VBO to the VAO.
+	 * After this when we use the VAO it will use the VBO that is bound to it.
+	 *
+	 *    @param 1: Index of the vertex attribute that is to be modified.
+	 *	  @param 2: Number of components per generic vertex attribute. 3 for x, y, z.
+	 *	  @param 3: Data type of each component in the array. GL_FLOAT for x, y, z.
+	 *    @param 4: Whether fixed-point data values should be normalized (GL_TRUE) or converted directly as fixed-point values (GL_FALSE) when they are accessed.
+	 *	  @param 5: Stride. Byte offset between consecutive generic vertex attributes. 3 * sizeof(GLfloat) for the three floats used for x, y, z in each vertex.
+	 *	  @param 6: Offset. Offset from the beginning of each vertex. 0/nullptr as the data is at the start of the array. casting to void pointer is just an untyped pointer, dont need to know the type.
+	 */
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr));
+	glEnableVertexAttribArray(0);    // Enable the vertex attribute array, you can have multiple vertex attributes and disable/enable them as needed.
 
 	// ********************************
 	// Prepare the window for rendering
 	// ********************************
-
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f);    // Set the color of the window when the buffer is cleared. Grey.
 	glViewport(0, 0, window_width, window_height);             // Maps the range of the window size to NDC space. This is the area that will be rendered to the screen. -1 to 1 on all axes.
 }
@@ -169,33 +211,15 @@ void render()
 	// Start of the rendering pipeline.
 	// ********************************
 
-	// --------------------------------
-	// Program 1: Fixed Triangle: Start
-	// --------------------------------
-	glUseProgram(program_fixed_tri);                     	    // Use the program object that was created and loaded with the shaders.
-	glDrawArrays(GL_TRIANGLES, 0, 3);           // Draw the triangle. Triangle primitive, start at 0, draw 3 vertices.
-	glPolygonMode(GL_FRONT, GL_FILL);                 // Draw the triangle in fill mode. Fill front faces of polygons.
+	glUseProgram(program_position_only);
+	glBindVertexArray(vao_tri);    // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
 
-	// Change the polygon mode based on mouse button press.
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	{
-		glPolygonMode(GL_FRONT, GL_LINE);    // On left-click draw the triangle in line mode. Draw the outline of the triangle.
-	}
-	else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-	{
-		glPolygonMode(GL_FRONT, GL_POINT);   // On right-click draw the triangle in point mode. Draw the vertices of the triangle.
-	}
-	else
-	{
-		glPolygonMode(GL_FRONT, GL_FILL);    // If no mouse button is pressed, draw the triangle in fill mode. Fill front faces of polygons.
-	}
-	// ------------------------------
-	// Program 1: Fixed Triangle: End
-	// ------------------------------
+	glDrawArrays(GL_TRIANGLES, 0, 3);    // Render the triangle. 3 vertices, starting from index 0.
 
 	// *****************************
 	// End of the rendering pipeline
 	// *****************************
+	glBindVertexArray(0);  // Unbind the VAO.
 	glUseProgram(0);     // Stop using the program object. Deactivate the program object.
 	glfwSwapBuffers(window);    // Swap the front and back buffers. End of the rendering pipeline.
 };
