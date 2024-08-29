@@ -23,16 +23,22 @@ Mail : Foster.Rae@mds.ac.nz
 
 GLFWwindow* window = nullptr;    // Pointer to the GLFW window.
 
-// Temporary variables for the dynamic triangle.
-GLfloat vertices_tri[] = { 0.0f, 0.0f, 0.0f,    // Vertex 1: Top
-						  -0.5f, 0.8f, 0.0f,    // Vertex 2: Bottom Right
-	                       0.5f, 0.8f, 0.0f     // Vertex 3: Bottom Left
+// Temporary variables for the dynamic triangle, Now includes color.
+
+                            // Position          // Color
+GLfloat vertices_tri[] = { -0.5f,  -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
+					        0.5f,  -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
+							0.5f,   0.5f, 0.0f,  0.0f, 0.0f, 1.0f,
+						   -0.5f,   0.5f, 0.0f,  1.0f, 1.0f, 0.0f,
+							0.5f,   -0.0f, 0.0f,  1.0f, 0.0f, 1.0f,
 };
 
 GLuint program_position_only;    // Program object for the position only shader.
+GLuint program_color_fade;       // Program object for the color fade shader.
 GLuint vbo_tri;				     // Vertex buffer object for the triangle, can put this somewhere else.
 GLuint vao_tri;				     // Vertex array object for the triangle, needs to be global as it is used in multiple functions.
 
+GLfloat current_time;
 int window_height = 800;
 int window_width = 800;
 
@@ -142,8 +148,8 @@ void initial_setup()
 	// ***********************************
 	// Load shaders, Create program object
 	// ***********************************
-	program_position_only = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
-	                                                    "Resources/Shaders/FixedColor.frag");
+	program_color_fade = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
+	                                                    "Resources/Shaders/FadeColor.frag");
 
 	// ********************************
 	// Generate the vertex array object
@@ -175,11 +181,13 @@ void initial_setup()
 	 *	  @param 2: Number of components per generic vertex attribute. 3 for x, y, z.
 	 *	  @param 3: Data type of each component in the array. GL_FLOAT for x, y, z.
 	 *    @param 4: Whether fixed-point data values should be normalized (GL_TRUE) or converted directly as fixed-point values (GL_FALSE) when they are accessed.
-	 *	  @param 5: Stride. Byte offset between consecutive generic vertex attributes. 3 * sizeof(GLfloat) for the three floats used for x, y, z in each vertex.
+	 *	  @param 5: Stride. Byte offset between consecutive generic vertex attributes. 6 * sizeof(GLfloat) for the three floats used for x, y, z in each vertex, and the three floats used for r, g, b in each vertex.
 	 *	  @param 6: Offset. Offset from the beginning of each vertex. 0/nullptr as the data is at the start of the array. casting to void pointer is just an untyped pointer, dont need to know the type.
 	 */
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr)); // Position attribute
 	glEnableVertexAttribArray(0);    // Enable the vertex attribute array, you can have multiple vertex attributes and disable/enable them as needed.
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat))); // Color attribute
+	glEnableVertexAttribArray(1);
 
 	// ********************************
 	// Prepare the window for rendering
@@ -196,7 +204,8 @@ void initial_setup()
  */
 void update()
 {
-	glfwPollEvents();    // Poll for events. This will update the state of the program and respond to any user input. 
+	glfwPollEvents();    // Poll for events. This will update the state of the program and respond to any user input.
+	current_time = static_cast<float>(glfwGetTime());    // Get the current time.
 }
 /**
  * @brief
@@ -211,10 +220,13 @@ void render()
 	// Start of the rendering pipeline.
 	// ********************************
 
-	glUseProgram(program_position_only);
-	glBindVertexArray(vao_tri);    // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
+	glUseProgram(program_color_fade);
+	glBindVertexArray(vao_tri); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);    // Render the triangle. 3 vertices, starting from index 0.
+	GLint current_time_loc = glGetUniformLocation(program_color_fade, "current_time");   // Get the location of the uniform variable in the shader.
+	glUniform1f(current_time_loc, current_time);	                                          // Set the value of the uniform variable.
+
+	glDrawArrays(GL_POLYGON, 0, 5);                                         // Render the triangle. 3 vertices, starting from index 0.
 
 	// *****************************
 	// End of the rendering pipeline
