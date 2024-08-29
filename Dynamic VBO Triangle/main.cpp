@@ -26,17 +26,21 @@ GLFWwindow* window = nullptr;    // Pointer to the GLFW window.
 // Temporary variables for the dynamic triangle, Now includes color.
 
                             // Position          // Color
-GLfloat vertices_tri[] = { -0.5f,  -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
-					        0.5f,  -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
-							0.5f,   0.5f, 0.0f,  0.0f, 0.0f, 1.0f,
-						   -0.5f,   0.5f, 0.0f,  1.0f, 1.0f, 0.0f,
-							0.5f,   -0.0f, 0.0f,  1.0f, 0.0f, 1.0f,
+GLfloat vertices_tri[] = { -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,    // Bottom left
+							0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,    // Bottom right
+							-0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // Top
 };
 
-GLuint program_position_only;    // Program object for the position only shader.
+GLfloat vertices_tri2[] = { -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,    // Bottom left
+							0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,    // Bottom right
+							0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // Top
+};
+
 GLuint program_color_fade;       // Program object for the color fade shader.
 GLuint vbo_tri;				     // Vertex buffer object for the triangle, can put this somewhere else.
 GLuint vao_tri;				     // Vertex array object for the triangle, needs to be global as it is used in multiple functions.
+GLuint vbo_tri2;				     // Vertex buffer object for the triangle, can put this somewhere else.
+GLuint vao_tri2;				     // Vertex array object for the triangle, needs to be global as it is used in multiple functions.
 
 GLfloat current_time;
 int window_height = 800;
@@ -189,6 +193,22 @@ void initial_setup()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat))); // Color attribute
 	glEnableVertexAttribArray(1);
 
+	// ***************
+	// Second triangle
+	// ***************
+
+	glGenVertexArrays(1, &vao_tri2);    																	// Generate a vertex array object name.
+	glBindVertexArray(vao_tri2);          																	// Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
+	glGenBuffers(1, &vbo_tri2);    																	    // Generate a buffer object name. This will be used to store the vertex data.
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_tri2);    												// Bind the VBO to the GL_ARRAY_BUFFER target slot.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_tri2), vertices_tri2, GL_STATIC_DRAW);   // Creates and initializes a buffer object's data store.
+
+	// Set the vertex attributes for the second triangle
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr)); // Position attribute
+	glEnableVertexAttribArray(0);    // Enable the vertex attribute array, you can have multiple vertex attributes and disable/enable them as needed.
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat))); // Color attribute
+	glEnableVertexAttribArray(1);
+
 	// ********************************
 	// Prepare the window for rendering
 	// ********************************
@@ -221,12 +241,16 @@ void render()
 	// ********************************
 
 	glUseProgram(program_color_fade);
-	glBindVertexArray(vao_tri); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
 
+	// Draw the first triangle
+	glBindVertexArray(vao_tri); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
 	GLint current_time_loc = glGetUniformLocation(program_color_fade, "current_time");   // Get the location of the uniform variable in the shader.
 	glUniform1f(current_time_loc, current_time);	                                          // Set the value of the uniform variable.
+	glDrawArrays(GL_TRIANGLES, 0, 3);                                         // Render the triangle. 3 vertices, starting from index 0.
 
-	glDrawArrays(GL_POLYGON, 0, 5);                                         // Render the triangle. 3 vertices, starting from index 0.
+	// Draw the second triangle
+	glBindVertexArray(vao_tri2); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	// *****************************
 	// End of the rendering pipeline
