@@ -26,21 +26,21 @@ GLFWwindow* window = nullptr;    // Pointer to the GLFW window.
 // Temporary variables for the dynamic triangle, Now includes color.
 
                             // Position          // Color
-GLfloat vertices_tri[] = { -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,    // Bottom left
-							0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,    // Bottom right
-							-0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // Top
+GLfloat vertices_tri[] = { -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,    // Bottom left
+							0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,    // Bottom right
+						   -0.5f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f,     // Top
 };
 
-GLfloat vertices_tri2[] = { -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,    // Bottom left
-							0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,    // Bottom right
-							0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // Top
+GLfloat vertices_tri2[] = { -0.5f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f,     // Bottom left
+							 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,    // Bottom right
+							 0.5f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f,     // Top
 };
 
 GLuint program_color_fade;       // Program object for the color fade shader.
-GLuint vbo_tri;				     // Vertex buffer object for the triangle, can put this somewhere else.
-GLuint vao_tri;				     // Vertex array object for the triangle, needs to be global as it is used in multiple functions.
-GLuint vbo_tri2;				     // Vertex buffer object for the triangle, can put this somewhere else.
-GLuint vao_tri2;				     // Vertex array object for the triangle, needs to be global as it is used in multiple functions.
+GLuint vbo_tri;				     // Vertex buffer object for the quad, holds the vertex data.
+GLuint vao_tri;				     // Vertex array object for the quad, holds the VBO and vertex attributes.
+GLuint vbo_tri2;				 // Vertex buffer object for the triangle, can put this somewhere else.
+GLuint vao_tri2;				 // Vertex array object for the triangle, needs to be global as it is used in multiple functions.
 
 GLfloat current_time;
 int window_height = 800;
