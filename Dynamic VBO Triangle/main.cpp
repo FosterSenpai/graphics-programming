@@ -45,7 +45,6 @@ GLuint indices_quad[] = {
 };
 
 // ** Object IDs **
-GLuint program_color_fade;       // Program object for the color fade shader.
 GLuint program_world_space;      // Program object for the world space shader.
 GLuint vbo_quad;				 // Vertex buffer object for the quad.
 GLuint vao_quad;				 // Vertex array object for the quad.
@@ -53,9 +52,12 @@ GLuint ebo_quad;				 // Element buffer object for the quad.
 
 // ** Matrices **
 // ** Translation **
-
 glm::vec3 quad_position = glm::vec3(0.5f, 0.5f, 0.0f);    // Move the quad to the right and up.
 glm::mat4 translation_matrix;	                                 // Translation matrix.
+
+// ** Rotation **
+float quad_rotation_angle = 45.0f;    // Rotate the quad by 45 degrees.
+glm::mat4 rotation_matrix;            // Rotation matrix.
 
 // ** Utility Variables **
 GLfloat current_time;            // Current time in seconds.
@@ -196,6 +198,7 @@ void update()
 {
 	// ** Calculate Matrices **
 	translation_matrix = glm::translate(glm::mat4(1.0f), quad_position);    // Create the translation matrix. Identity matrix, translate by quad_position.
+	rotation_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(quad_rotation_angle), glm::vec3(0.0f, 0.0f, 1.0f));    // Create the rotation matrix. Identity matrix, rotate by quad_rotation_angle around the z-axis.
 
 	// ** Update the state of the program **
 	glfwPollEvents();    // Poll for events. This will update the state of the program and respond to any user input.
@@ -219,7 +222,7 @@ void render()
 	// Bind the VAO and draw the quad
 	glBindVertexArray(vao_quad);         													  // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
 
-	// ** Set the uniform variables **
+	// ** Send Uniforms to the Shader **
 
 	// ** Time **
 	GLint current_time_loc = glGetUniformLocation(program_world_space, "current_time");   // Get the location of the uniform variable in the shader.
@@ -227,6 +230,9 @@ void render()
 	// ** Translation **
 	GLint translation_matrix_location = glGetUniformLocation(program_world_space, "translation_matrix");             // Get the location of the uniform variable in the shader.
 	glUniformMatrix4fv(translation_matrix_location, 1, GL_FALSE, glm::value_ptr(translation_matrix));    // Set the value of the uniform variable.
+	// ** Rotation **
+	GLint rotation_matrix_location = glGetUniformLocation(program_world_space, "rotation_matrix");             // Get the location of the uniform variable in the shader.
+	glUniformMatrix4fv(rotation_matrix_location, 1, GL_FALSE, glm::value_ptr(rotation_matrix));    // Set the value of the uniform variable.
 
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);          // Draw the elements using the indices in the element buffer object. each index is a vertex.
