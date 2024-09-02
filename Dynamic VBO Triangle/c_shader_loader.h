@@ -49,12 +49,12 @@ private:
 	 * @brief
 	 *		Default constructor.
 	 */
-	c_shader_loader();
+	c_shader_loader(void);
 	/**
 	 * @brief
 	 *		Default destructor.
 	 */
-	~c_shader_loader();
+	~c_shader_loader(void);
 
 	// ** Private Methods **
 

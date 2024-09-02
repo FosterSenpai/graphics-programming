@@ -15,6 +15,9 @@ Mail : Foster.Rae@mds.ac.nz
 
 #include <iostream>
 #include "c_shader_loader.h"
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 
 // ======================================================================
 // Globals
@@ -43,9 +46,16 @@ GLuint indices_quad[] = {
 
 // ** Object IDs **
 GLuint program_color_fade;       // Program object for the color fade shader.
+GLuint program_world_space;      // Program object for the world space shader.
 GLuint vbo_quad;				 // Vertex buffer object for the quad.
 GLuint vao_quad;				 // Vertex array object for the quad.
 GLuint ebo_quad;				 // Element buffer object for the quad.
+
+// ** Matrices **
+// ** Translation **
+
+glm::vec3 quad_position = glm::vec3(0.5f, 0.5f, 0.0f);    // Move the quad to the right and up.
+glm::mat4 translation_matrix;	                                 // Translation matrix.
 
 // ** Utility Variables **
 GLfloat current_time;            // Current time in seconds.
@@ -128,8 +138,9 @@ int main()
 void initial_setup()
 {
 	// Load shaders, Create program object
-	program_color_fade = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
-	                                                    "Resources/Shaders/FadeColor.frag");
+
+	program_world_space = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
+	                                                      "Resources/Shaders/FadeColor.frag");
 
 	// Generate the vertex array object
 	glGenVertexArrays(1, &vao_quad);    // Generate a vertex array object name.
@@ -168,6 +179,7 @@ void initial_setup()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat))); // Color attribute
 	glEnableVertexAttribArray(1);    // Enable the color attribute array.
 
+
 	// Prepare the window for rendering
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f);    // Set the color of the window when the buffer is cleared. Grey.
 	glViewport(0, 0, window_width, window_height);             // Maps the range of the window size to NDC space. This is the area that will be rendered to the screen. -1 to 1 on all axes.
@@ -182,6 +194,10 @@ void initial_setup()
  */
 void update()
 {
+	// ** Calculate Matrices **
+	translation_matrix = glm::translate(glm::mat4(1.0f), quad_position);    // Create the translation matrix. Identity matrix, translate by quad_position.
+
+	// ** Update the state of the program **
 	glfwPollEvents();    // Poll for events. This will update the state of the program and respond to any user input.
 	current_time = static_cast<float>(glfwGetTime());    // Get the current time.
 }
@@ -198,12 +214,21 @@ void render()
 
 	// ** Start of the rendering pipeline **
 
-	glUseProgram(program_color_fade);
+	glUseProgram(program_world_space);
 
 	// Bind the VAO and draw the quad
 	glBindVertexArray(vao_quad);         													  // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
-	GLint current_time_loc = glGetUniformLocation(program_color_fade, "current_time");   // Get the location of the uniform variable in the shader.
+
+	// ** Set the uniform variables **
+
+	// ** Time **
+	GLint current_time_loc = glGetUniformLocation(program_world_space, "current_time");   // Get the location of the uniform variable in the shader.
 	glUniform1f(current_time_loc, current_time);	                                          // Set the value of the uniform variable.
+	// ** Translation **
+	GLint translation_matrix_location = glGetUniformLocation(program_world_space, "translation_matrix");             // Get the location of the uniform variable in the shader.
+	glUniformMatrix4fv(translation_matrix_location, 1, GL_FALSE, glm::value_ptr(translation_matrix));    // Set the value of the uniform variable.
+
+
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);          // Draw the elements using the indices in the element buffer object. each index is a vertex.
 
 

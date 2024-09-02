@@ -22,9 +22,9 @@ Mail : Foster.Rae@mds.ac.nz
 // Constructors / Destructors
 // ======================================================================
 
-c_shader_loader::c_shader_loader() = default;
+c_shader_loader::c_shader_loader(void) {}
 
-c_shader_loader::~c_shader_loader() = default;
+c_shader_loader::~c_shader_loader(void) {}
 
 // ======================================================================
 // Functions
@@ -103,7 +103,7 @@ std::string c_shader_loader::read_shader_file(const char* filename)
 	file.seekg(0, std::ios::beg); 			   // set the position of the next character to be read back to the beginning.
 
 	// ** Extract contents of file **
-	file.read(&shader_code[0], static_cast<long long>(shader_code.size()));	// read the file into the resized string variable.  // NOLINT(readability-container-data-pointer)
+	file.read(&shader_code[0], shader_code.size());	// read the file into the resized string variable.
 	file.close(); 											// close the file.
 	return shader_code; 									// return the shader code.
 }
@@ -117,8 +117,7 @@ void c_shader_loader::print_error_details(bool is_shader, GLuint id, const char*
 	std::vector<char> log(info_log_length);
 
 	// Retrieve the log info and populate log variable.
-	(is_shader == true) ? glGetShaderInfoLog(id, info_log_length, nullptr, log.data()) : glGetProgramInfoLog(id, info_log_length, nullptr,
-		log.data());
+	(is_shader == true) ? glGetShaderInfoLog(id, info_log_length, NULL, &log[0]) : glGetProgramInfoLog(id, info_log_length, NULL, &log[0]);
 	std::cout << "Error compiling " << ((is_shader == true) ? "shader" : "program") << ": " << name << '\n';
-	std::cout << log.data() << '\n';
+	std::cout << &log[0] << '\n';
 }

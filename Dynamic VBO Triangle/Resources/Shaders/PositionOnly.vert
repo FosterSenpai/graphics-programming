@@ -1,14 +1,20 @@
 #version 460 core
 
-layout (location = 0) in vec3 position; // The position of the vertex
-layout (location = 1) in vec3 color; // The color of the vertex
+// How the shader should interpret the input data
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 color;
 
-// Color isnt used in this shader, so we can just pass it through to the next stage.
-out vec3 frag_color; // Output color to the fragment shader
+// Inputs
+uniform mat4 translation_matrix;
 
+// Outputs to fragment shader
+out vec3 fragment_color;
+out vec3 fragment_position;
+
+// Shader functionalty
 void main()
 {
-	// Passing the position from the vertex shader to the next stage
-	gl_Position = vec4(position, 1.0);
-	frag_color = color; // Pass the color to the fragment shader without doing anything to it.
+	// We are multiplying the position by the translation matrix, which will move the object
+	gl_Position = translation_matrix * vec4(position, 1.0);
+	fragment_color = color;
 }
