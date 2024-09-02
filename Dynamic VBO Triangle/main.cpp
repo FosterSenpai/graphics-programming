@@ -52,16 +52,23 @@ GLuint ebo_quad;				 // Element buffer object for the quad.
 
 // ** Matrices **
 // ** Translation **
-glm::vec3 quad_position = glm::vec3(0.5f, 0.5f, 0.0f);    // Move the quad to the right and up.
+glm::vec3 quad_position1 = glm::vec3(0.5f, 0.5f, 0.0f);    // Move the quad to the right and up.
+glm::vec3 quad_position2 = glm::vec3(-0.5f, 0.5f, 0.0f);   // Move the quad to the left and up.
 glm::mat4 translation_matrix;	                                 // Translation matrix.
 
 // ** Rotation **
-float quad_rotation_angle = 45.0f;    // Rotate the quad by 45 degrees.
+float quad_rotation_angle1 = 45.0f;    // Rotate the quad by 45 degrees.
+float quad_rotation_angle2 = 60.0f;   // Rotate the quad by 60 degrees.
 glm::mat4 rotation_matrix;            // Rotation matrix.
 
 // ** Scaling **
-glm::vec3 quad_scale = glm::vec3(0.5f, 0.5f, 1.0f);    // Scale the quad down to half its size.
+glm::vec3 quad_scale1 = glm::vec3(0.5f, 0.5f, 1.0f);    // Scale the quad down to half its size.
+glm::vec3 quad_scale2 = glm::vec3(0.3f, 0.3f, 1.0f);  // Scale the quad down to 30% of its size.
 glm::mat4 scale_matrix;            							  // Scale matrix.
+
+// ** Model Matrices **
+glm::mat4 model_matrix1;	// Model matrix for the first quad.
+glm::mat4 model_matrix2;	// Model matrix for the second quad.
 
 // ** Utility Variables **
 GLfloat current_time;            // Current time in seconds.
@@ -201,12 +208,26 @@ void initial_setup()
 void update()
 {
 	// ** Calculate Matrices **
+
+	// * First Model Matrix *
 	// Create the translation matrix. Identity matrix, translate by quad_position.
-	translation_matrix = glm::translate(glm::mat4(1.0f), quad_position);
+	translation_matrix = glm::translate(glm::mat4(1.0f), quad_position1);
 	// Create the rotation matrix. Identity matrix, rotate by quad_rotation_angle around the z-axis.
-	rotation_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(quad_rotation_angle), glm::vec3(0.0f, 0.0f, 1.0f));
+	rotation_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(quad_rotation_angle1), glm::vec3(0.0f, 0.0f, 1.0f));
 	// Create the scale matrix. Identity matrix, scale by quad_scale.
-	scale_matrix = glm::scale(glm::mat4(1.0f), quad_scale);
+	scale_matrix = glm::scale(glm::mat4(1.0f), quad_scale1);
+	// Collate the matrices into the model matrix.
+	model_matrix1 = translation_matrix * rotation_matrix * scale_matrix;
+
+	// * Second Model Matrix *
+	// Create the translation matrix. Identity matrix, translate by quad_position.
+	translation_matrix = glm::translate(glm::mat4(1.0f), quad_position2);
+	// Create the rotation matrix. Identity matrix, rotate by quad_rotation_angle around the z-axis.
+	rotation_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(quad_rotation_angle2), glm::vec3(0.0f, 0.0f, 1.0f));
+	// Create the scale matrix. Identity matrix, scale by quad_scale.
+	scale_matrix = glm::scale(glm::mat4(1.0f), quad_scale2);
+	// Collate the matrices into the model matrix.
+	model_matrix2 = translation_matrix * rotation_matrix * scale_matrix;
 
 
 	// ** Update the state of the program **
@@ -236,17 +257,15 @@ void render()
 	// ** Time **
 	GLint current_time_loc = glGetUniformLocation(program_world_space, "current_time");   // Get the location of the uniform variable in the shader.
 	glUniform1f(current_time_loc, current_time);	                                          // Set the value of the uniform variable.
-	// ** Translation **
-	GLint translation_matrix_location = glGetUniformLocation(program_world_space, "translation_matrix");             // Get the location of the uniform variable in the shader.
-	glUniformMatrix4fv(translation_matrix_location, 1, GL_FALSE, glm::value_ptr(translation_matrix));    // Set the value of the uniform variable.
-	// ** Rotation **
-	GLint rotation_matrix_location = glGetUniformLocation(program_world_space, "rotation_matrix");             // Get the location of the uniform variable in the shader.
-	glUniformMatrix4fv(rotation_matrix_location, 1, GL_FALSE, glm::value_ptr(rotation_matrix));    // Set the value of the uniform variable.
-	// ** Scale **
-	GLint scale_matrix_location = glGetUniformLocation(program_world_space, "scale_matrix");             // Get the location of the uniform variable in the shader.
-	glUniformMatrix4fv(scale_matrix_location, 1, GL_FALSE, glm::value_ptr(scale_matrix));    // Set the value of the uniform variable.
+	// ** Model Matrix **
+	GLint model_matrix_loc = glGetUniformLocation(program_world_space, "model_matrix");    // Get the location of the uniform variable in the shader.
 
+	// render first quad
+	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(model_matrix1));      // Set the value of the uniform variable.
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);          // Draw the elements using the indices in the element buffer object. each index is a vertex.
 
+	// render second quad
+	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(model_matrix2));      // Change the model matrix for drawing the second quad.
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);          // Draw the elements using the indices in the element buffer object. each index is a vertex.
 
 
