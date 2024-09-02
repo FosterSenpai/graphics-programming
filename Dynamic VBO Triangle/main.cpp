@@ -14,51 +14,41 @@ Mail : Foster.Rae@mds.ac.nz
 // ======================================================================
 
 #include <iostream>
-#include <vector>
 #include "c_shader_loader.h"
 
 // ======================================================================
 // Globals
 // ======================================================================
 
+// ** Window Variables **
 GLFWwindow* window = nullptr;    // Pointer to the GLFW window.
-
-// Temporary variables for the dynamic triangle, Now includes color.
-
-                            // Position          // Color
-GLfloat vertices_tri[] = { -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,    // Bottom left
-							0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,    // Bottom right
-						   -0.5f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f,     // Top
-};
-
-GLfloat vertices_tri2[] = { -0.5f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f,     // Bottom left
-							 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,    // Bottom right
-							 0.5f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f,     // Top
-};
-
-GLuint program_color_fade;       // Program object for the color fade shader.
-GLuint vbo_tri;				     // Vertex buffer object for the quad, holds the vertex data.
-GLuint vao_tri;				     // Vertex array object for the quad, holds the VBO and vertex attributes.
-GLuint vbo_tri2;				 // Vertex buffer object for the triangle, can put this somewhere else.
-GLuint vao_tri2;				 // Vertex array object for the triangle, needs to be global as it is used in multiple functions.
-
-GLfloat current_time;
 int window_height = 800;
 int window_width = 800;
 
-// *************************
-// Dynamic Array of vertices
-// *************************
-
-
-// ======================================================================
-// Data Structures
-// ======================================================================
-
-struct s_vertex
-{
-	float x, y, z;
+// ** Vertex data **
+GLfloat vertices_quad[] = {
+//Index      // Position			// Color
+	/* 0*/	-0.5f, 0.5f, 0.0f,		1.0f, 0.0f, 0.0f, // Top - Left
+	/* 1*/	0.5f, 0.5f, 0.0f,		0.0f, 1.0f, 0.0f, // Top - Right
+	/* 2*/	0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f, // Bottom - Right
+	/* 3*/	-0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 0.0f // Bottom - Left
 };
+
+// Array of indices for the quad.
+GLuint indices_quad[] = {
+	0, 1, 2, // First triangle (Top Left, Top Right, Bottom Right)
+	0, 2, 3  // Second triangle (Top Left, Bottom Right, Bottom Left)
+	// Triangles connected from top left to bottom right.
+};
+
+// ** Object IDs **
+GLuint program_color_fade;       // Program object for the color fade shader.
+GLuint vbo_quad;				 // Vertex buffer object for the quad.
+GLuint vao_quad;				 // Vertex array object for the quad.
+GLuint ebo_quad;				 // Element buffer object for the quad.
+
+// ** Utility Variables **
+GLfloat current_time;            // Current time in seconds.
 
 // ======================================================================
 // Function Declarations
@@ -74,30 +64,25 @@ void render();
 
 int main()
 {
-	// ***************
 	// Initialise GLFW
-	// ***************
-
 	glfwInit(); // Must be called before any other GLFW functions.
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
-	window = glfwCreateWindow(window_width, window_height, "Graphics Framework", nullptr, nullptr); // Create a window.
 
+	// Create a windowed mode window and its OpenGL context
+	window = glfwCreateWindow(window_width, window_height, "Graphics Framework", nullptr, nullptr); // Create a window.
 	if (window == nullptr) 	   		   // Check if the window was created successfully, if not terminate the program.
 	{
 		std::cout << "Failed to create GLFW window" << '\n';
 		glfwTerminate();
 		return -1;
 	}
-
 	glfwMakeContextCurrent(window);    // Make the window the current context.
 
-	// ***************
-	// Initialise GLEW
-	// ***************
 
+	// Initialise GLEW
 	/*
 	* This function must be called after the initialization of the GLFW window and before any OpenGL functions are called.
 	* This populates all the OpenGL function pointers with the correct functions that are supported by the graphics card.
@@ -111,29 +96,22 @@ int main()
 		return -1;
 	}
 
-	// **************************************
-	// Setup the initial state of the program
-	// **************************************
-
+	// Set up the initial state of the program
 	initial_setup();
 
-	// *********
-	// Main Loop
-	// *********
 
+	// ** Main Loop **
 	while (glfwWindowShouldClose(window) == false)    // While window is open, keep running the program.
 	{
 		update();    // Update all objects and run the processes.
 		render();    // Render the objects.
 	}
 
-	// *********************
-	// Terminate the program
-	// *********************
-
+	// ** End of main loop. Terminate the program **
 	glfwTerminate();    // Terminate the GLFW window.
 	return 0;
 }
+
 
 // ======================================================================
 // Function Definitions
@@ -149,29 +127,25 @@ int main()
  */
 void initial_setup()
 {
-	// ***********************************
 	// Load shaders, Create program object
-	// ***********************************
 	program_color_fade = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
 	                                                    "Resources/Shaders/FadeColor.frag");
 
-	// ********************************
 	// Generate the vertex array object
-	// ********************************
-	glGenVertexArrays(1, &vao_tri);    // Generate a vertex array object name.
-	glBindVertexArray(vao_tri);          // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
+	glGenVertexArrays(1, &vao_quad);    // Generate a vertex array object name.
+	glBindVertexArray(vao_quad);          // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
 
-	// *********************************
+	// Generate the element buffer object
+	glGenBuffers(1, &ebo_quad);    																	           // Generate a buffer object name. This will be used to store the vertex data.
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_quad);    									           // Bind the VBO to the GL_ARRAY_BUFFER target slot.
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_quad), indices_quad, GL_STATIC_DRAW);    // Creates and initializes a buffer object's data store.
+
 	// Generate the vertex buffer object
-	// *********************************
-	glGenBuffers(1, &vbo_tri);    																	   // Generate a buffer object name. This will be used to store the vertex data.
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_tri);    												   // Bind the VBO to the GL_ARRAY_BUFFER target slot.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_tri), vertices_tri, GL_STATIC_DRAW);    // Creates and initializes a buffer object's data store.
+	glGenBuffers(1, &vbo_quad);    																	     // Generate a buffer object name. This will be used to store the vertex data.
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_quad);    												 // Bind the VBO to the GL_ARRAY_BUFFER target slot.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_quad), vertices_quad, GL_STATIC_DRAW);    // Creates and initializes a buffer object's data store.
 
-	// *************************
 	// Set the vertex attributes
-	// *************************
-
 	/**
 	 * NOTE TO SELF:
 	 *
@@ -190,31 +164,15 @@ void initial_setup()
 	 */
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr)); // Position attribute
 	glEnableVertexAttribArray(0);    // Enable the vertex attribute array, you can have multiple vertex attributes and disable/enable them as needed.
+
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat))); // Color attribute
-	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(1);    // Enable the color attribute array.
 
-	// ***************
-	// Second triangle
-	// ***************
-
-	glGenVertexArrays(1, &vao_tri2);    																	// Generate a vertex array object name.
-	glBindVertexArray(vao_tri2);          																	// Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
-	glGenBuffers(1, &vbo_tri2);    																	    // Generate a buffer object name. This will be used to store the vertex data.
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_tri2);    												// Bind the VBO to the GL_ARRAY_BUFFER target slot.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_tri2), vertices_tri2, GL_STATIC_DRAW);   // Creates and initializes a buffer object's data store.
-
-	// Set the vertex attributes for the second triangle
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr)); // Position attribute
-	glEnableVertexAttribArray(0);    // Enable the vertex attribute array, you can have multiple vertex attributes and disable/enable them as needed.
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat))); // Color attribute
-	glEnableVertexAttribArray(1);
-
-	// ********************************
 	// Prepare the window for rendering
-	// ********************************
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f);    // Set the color of the window when the buffer is cleared. Grey.
 	glViewport(0, 0, window_width, window_height);             // Maps the range of the window size to NDC space. This is the area that will be rendered to the screen. -1 to 1 on all axes.
 }
+
 /**
  * @brief
  *      Update
@@ -227,6 +185,7 @@ void update()
 	glfwPollEvents();    // Poll for events. This will update the state of the program and respond to any user input.
 	current_time = static_cast<float>(glfwGetTime());    // Get the current time.
 }
+
 /**
  * @brief
  *       Render the scene
@@ -236,25 +195,20 @@ void update()
 void render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    // Clear the colour and depth buffers.
-	// ********************************
-	// Start of the rendering pipeline.
-	// ********************************
+
+	// ** Start of the rendering pipeline **
 
 	glUseProgram(program_color_fade);
 
-	// Draw the first triangle
-	glBindVertexArray(vao_tri); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
+	// Bind the VAO and draw the quad
+	glBindVertexArray(vao_quad);         													  // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
 	GLint current_time_loc = glGetUniformLocation(program_color_fade, "current_time");   // Get the location of the uniform variable in the shader.
 	glUniform1f(current_time_loc, current_time);	                                          // Set the value of the uniform variable.
-	glDrawArrays(GL_TRIANGLES, 0, 3);                                         // Render the triangle. 3 vertices, starting from index 0.
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);          // Draw the elements using the indices in the element buffer object. each index is a vertex.
 
-	// Draw the second triangle
-	glBindVertexArray(vao_tri2); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
-	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	// *****************************
-	// End of the rendering pipeline
-	// *****************************
+	// ** End of the rendering pipeline **
+
 	glBindVertexArray(0);  // Unbind the VAO.
 	glUseProgram(0);     // Stop using the program object. Deactivate the program object.
 	glfwSwapBuffers(window);    // Swap the front and back buffers. End of the rendering pipeline.

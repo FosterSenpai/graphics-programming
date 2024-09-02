@@ -9,8 +9,6 @@ Description : Static class to load and compile shaders.
 Author : Foster Rae
 Mail : Foster.Rae@mds.ac.nz
 ************************************************************************/
-/* Todo: Add function descriptions
-************************************************************************/
 // ======================================================================
 // Includes
 // ======================================================================
@@ -18,7 +16,8 @@ Mail : Foster.Rae@mds.ac.nz
 #pragma once
 #include <iostream>
 #include "Dependencies/GLEW/glew.h" // GLEW must be included before GLFW.
-#include "Dependencies/GLFW/glfw3.h"
+// ReSharper disable once CppUnusedIncludeDirective
+#include "Dependencies/GLFW/glfw3.h" // This is definitely being used.
 
 // ======================================================================
 // Class
@@ -26,9 +25,8 @@ Mail : Foster.Rae@mds.ac.nz
 class c_shader_loader
 {
 public:
-	// ****************
-	// Public Methods
-	// ****************
+
+	// ** Public Methods **
 
 	/**
 	 * @brief
@@ -45,24 +43,20 @@ public:
 	static GLuint create_program(const char* vertex_shader_filename, const char* fragment_shader_filename);
 
 private:
-	// **************************
-	// Constructors / Destructors
-	// **************************
+	// ** Constructors / Destructors **
 
 	/**
 	 * @brief
 	 *		Default constructor.
 	 */
-	c_shader_loader(void);
+	c_shader_loader();
 	/**
 	 * @brief
 	 *		Default destructor.
 	 */
-	~c_shader_loader(void);
+	~c_shader_loader();
 
-	// ***************
-	// Private Methods
-	// ***************
+	// ** Private Methods **
 
 	/**
 	 * @brief

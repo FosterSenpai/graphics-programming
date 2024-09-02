@@ -22,9 +22,9 @@ Mail : Foster.Rae@mds.ac.nz
 // Constructors / Destructors
 // ======================================================================
 
-c_shader_loader::c_shader_loader(void) {}
+c_shader_loader::c_shader_loader() = default;
 
-c_shader_loader::~c_shader_loader(void) {}
+c_shader_loader::~c_shader_loader() = default;
 
 // ======================================================================
 // Functions
@@ -42,9 +42,7 @@ GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const
 	glAttachShader(program, fragmentShader);    // attach the fragment shader.
 	glLinkProgram(program); 					// link the shaders into a complete program.
 
-	// *********************
-	// Check for link errors
-	// *********************
+	// ** Check for link errors **
 	int link_result = 0;
 	glGetProgramiv(program, GL_LINK_STATUS, &link_result);    // get program link status.
 	if (link_result == GL_FALSE)                				   // if the program failed to link.
@@ -55,9 +53,7 @@ GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const
 		return 0;
 	}
 
-	// **************
-	// Delete Shaders
-	// **************
+	// ** Delete Shaders **
 	glDeleteShader(vertexShader); 	   // delete the vertex shader.
 	glDeleteShader(fragmentShader);    // delete the fragment shader.
 
@@ -66,9 +62,7 @@ GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const
 
 GLuint c_shader_loader::create_shader(GLenum shader_type, const char* shader_name)
 {
-	// **************************************************
-	// Create shader object and populate with shader code
-	// **************************************************
+	// ** Create shader object and populate with shader code **
 	std::string shader_code = read_shader_file(shader_name);  		 // Save the shader code as a string.
 
 	// Create the shader ID and create pointers for source code string and length.
@@ -80,9 +74,7 @@ GLuint c_shader_loader::create_shader(GLenum shader_type, const char* shader_nam
 	glShaderSource(shader_id, 1, &p_shader_code, &code_length);	 // Populate the shader object with the shader code.
 	glCompileShader(shader_id);                                          // Compile the shader.
 
-	// ************************
-	// Check for compile errors
-	// ************************
+	// ** Check for compile errors **
 	int compile_result = 0;
 	glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_result);    // Get the shader compile status.
 	if (compile_result == GL_FALSE)
@@ -95,9 +87,7 @@ GLuint c_shader_loader::create_shader(GLenum shader_type, const char* shader_nam
 
 std::string c_shader_loader::read_shader_file(const char* filename)
 {
-	// *************************
-	// Open the file for reading
-	// *************************
+	// ** Open the file for reading **
 	std::ifstream file(filename, std::ios::in);
 	std::string shader_code;
 
@@ -112,10 +102,8 @@ std::string c_shader_loader::read_shader_file(const char* filename)
 	shader_code.resize((unsigned int)file.tellg());    // resizing to the size of tellg cast to an unsigned int, the end position is effectively the size of the file.
 	file.seekg(0, std::ios::beg); 			   // set the position of the next character to be read back to the beginning.
 
-	// ************************
-	// Extract contents of file
-	// ************************
-	file.read(&shader_code[0], shader_code.size());	// read the file into the resized string variable.
+	// ** Extract contents of file **
+	file.read(&shader_code[0], static_cast<long long>(shader_code.size()));	// read the file into the resized string variable.  // NOLINT(readability-container-data-pointer)
 	file.close(); 											// close the file.
 	return shader_code; 									// return the shader code.
 }
@@ -129,7 +117,8 @@ void c_shader_loader::print_error_details(bool is_shader, GLuint id, const char*
 	std::vector<char> log(info_log_length);
 
 	// Retrieve the log info and populate log variable.
-	(is_shader == true) ? glGetShaderInfoLog(id, info_log_length, NULL, &log[0]) : glGetProgramInfoLog(id, info_log_length, NULL, &log[0]);
+	(is_shader == true) ? glGetShaderInfoLog(id, info_log_length, nullptr, log.data()) : glGetProgramInfoLog(id, info_log_length, nullptr,
+		log.data());
 	std::cout << "Error compiling " << ((is_shader == true) ? "shader" : "program") << ": " << name << '\n';
-	std::cout << &log[0] << '\n';
+	std::cout << log.data() << '\n';
 }
