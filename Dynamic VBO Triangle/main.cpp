@@ -59,6 +59,10 @@ glm::mat4 translation_matrix;	                                 // Translation ma
 float quad_rotation_angle = 45.0f;    // Rotate the quad by 45 degrees.
 glm::mat4 rotation_matrix;            // Rotation matrix.
 
+// ** Scaling **
+glm::vec3 quad_scale = glm::vec3(0.5f, 0.5f, 1.0f);    // Scale the quad down to half its size.
+glm::mat4 scale_matrix;            							  // Scale matrix.
+
 // ** Utility Variables **
 GLfloat current_time;            // Current time in seconds.
 
@@ -197,8 +201,13 @@ void initial_setup()
 void update()
 {
 	// ** Calculate Matrices **
-	translation_matrix = glm::translate(glm::mat4(1.0f), quad_position);    // Create the translation matrix. Identity matrix, translate by quad_position.
-	rotation_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(quad_rotation_angle), glm::vec3(0.0f, 0.0f, 1.0f));    // Create the rotation matrix. Identity matrix, rotate by quad_rotation_angle around the z-axis.
+	// Create the translation matrix. Identity matrix, translate by quad_position.
+	translation_matrix = glm::translate(glm::mat4(1.0f), quad_position);
+	// Create the rotation matrix. Identity matrix, rotate by quad_rotation_angle around the z-axis.
+	rotation_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(quad_rotation_angle), glm::vec3(0.0f, 0.0f, 1.0f));
+	// Create the scale matrix. Identity matrix, scale by quad_scale.
+	scale_matrix = glm::scale(glm::mat4(1.0f), quad_scale);
+
 
 	// ** Update the state of the program **
 	glfwPollEvents();    // Poll for events. This will update the state of the program and respond to any user input.
@@ -233,6 +242,9 @@ void render()
 	// ** Rotation **
 	GLint rotation_matrix_location = glGetUniformLocation(program_world_space, "rotation_matrix");             // Get the location of the uniform variable in the shader.
 	glUniformMatrix4fv(rotation_matrix_location, 1, GL_FALSE, glm::value_ptr(rotation_matrix));    // Set the value of the uniform variable.
+	// ** Scale **
+	GLint scale_matrix_location = glGetUniformLocation(program_world_space, "scale_matrix");             // Get the location of the uniform variable in the shader.
+	glUniformMatrix4fv(scale_matrix_location, 1, GL_FALSE, glm::value_ptr(scale_matrix));    // Set the value of the uniform variable.
 
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);          // Draw the elements using the indices in the element buffer object. each index is a vertex.
