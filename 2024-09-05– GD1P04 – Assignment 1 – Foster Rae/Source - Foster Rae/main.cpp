@@ -23,22 +23,6 @@ GLFWwindow* window = nullptr;
 int window_height = 800;
 int window_width = 800;
 
-// ** Vertex data **
-GLfloat vertices_quad[] = {
-//Index      // Position			// Color        // Texture Coordinates
-/* 0*/	-0.5f,  0.5f, 0.0f,		1.0f, 0.0f, 0.0f,   0.0f, 1.0f, // Top - Left
-/* 1*/	 0.5f,  0.5f, 0.0f,		0.0f, 1.0f, 0.0f,   1.0f, 1.0f, // Top - Right
-/* 2*/	 0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,   1.0f, 0.0f, // Bottom - Right
-/* 3*/	-0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 0.0f,   0.0f, 0.0f, // Bottom - Left
-
-};
-// Array of indices for the quad.
-GLuint indices_quad[] = {
-	0, 1, 2, // First triangle (Top Left, Top Right, Bottom Right)
-	0, 2, 3  // Second triangle (Top Left, Bottom Right, Bottom Left)
-	// Triangles connected from top left to bottom right.
-};
-
 // ** Object IDs **
 GLuint program_world_space;      // Program object for the world space shader.
 GLuint program_texture;          // Program object for the texture shader.
@@ -163,19 +147,32 @@ int main()
 
 void initial_setup()
 {
-	// Load shaders, Create program object
-	program_world_space = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
-	                                                      "Resources/Shaders/FadeColor.frag");
+	// ** Vertex data **
+	GLfloat vertices_quad[] = {
+	//Index      // Position			// Color        // Texture Coordinates
+	/* 0*/	-0.5f,  0.5f, 0.0f,		1.0f, 0.0f, 0.0f,   0.0f, 1.0f, // Top - Left
+	/* 1*/	 0.5f,  0.5f, 0.0f,		0.0f, 1.0f, 0.0f,   1.0f, 1.0f, // Top - Right
+	/* 2*/	 0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,   1.0f, 0.0f, // Bottom - Right
+	/* 3*/	-0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 0.0f,   0.0f, 0.0f, // Bottom - Left
+	};
 
+	// Array of indices for the quad.
+	GLuint indices_quad[] = {
+		0, 1, 2, // First triangle (Top Left, Top Right, Bottom Right)
+		0, 2, 3  // Second triangle (Top Left, Bottom Right, Bottom Left)
+		// Triangles connected from top left to bottom right.
+	};
+
+	// ** Create Program & Load Shaders **
 	program_texture = c_shader_loader::create_program("Resources/Shaders/Texture.vert",
 	                                                  "Resources/Shaders/Texture.frag");
 
-	// ** Texture Loading ***
+	// *** Texture Loading ***
 	stbi_set_flip_vertically_on_load(true); // Flip textures on the y-axis.
 	int image_width, image_height, image_components; // Variables to store the image dimensions and components.
 	unsigned char* image_data = stbi_load("Resources/Textures/Alien.PNG", &image_width, &image_height, &image_components, 0); // Load the image data.
 
-	// ** VAO \ VBO \ EBO **
+	// *** VAO \ VBO \ EBO ***
 	// Generate the vertex array object
 	glGenVertexArrays(1, &vao_quad); // Generate a vertex array object name.
 	glBindVertexArray(vao_quad); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
