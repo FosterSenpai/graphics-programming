@@ -6,6 +6,8 @@ in vec2 frag_tex_coords;
 
 // Uniform inputs
 uniform sampler2D texture_0;
+uniform bool is_animated; // Flag to switch between modes
+uniform float offset;     // Offset for animation
 
 // Output
 out vec4 final_color;
@@ -13,5 +15,12 @@ out vec4 final_color;
 // Shader functionality
 void main()
 {
-	final_color = texture(texture_0, frag_tex_coords);
+    vec2 tex_coords = frag_tex_coords;
+
+    if (is_animated) {
+        // Apply offset for animation
+        tex_coords.x += offset;
+    }
+
+    final_color = texture(texture_0, tex_coords);
 }

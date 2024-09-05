@@ -33,13 +33,13 @@
     <None Include="Resources\Shaders\FadeColor.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="Resources\Shaders\VertexColor.frag">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="Resources\Shaders\PositionOnly.vert">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="Resources\Shaders\Texture.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Resources\Shaders\Texture.frag">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

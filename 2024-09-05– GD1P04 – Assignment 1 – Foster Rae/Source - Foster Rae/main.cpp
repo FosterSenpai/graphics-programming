@@ -24,34 +24,57 @@ int window_height = 800;
 int window_width = 800;
 
 // ** Object IDs **
-GLuint program_world_space;      // Program object for the world space shader.
+GLuint program_hexagon;          // Program object for the quad shader.
 GLuint program_texture;          // Program object for the texture shader.
 GLuint vbo_quad;				 // Vertex buffer object for the quad.
 GLuint vao_quad;				 // Vertex array object for the quad.
 GLuint ebo_quad;				 // Element buffer object for the quad.
+GLuint vbo_hexagon;				 // Vertex buffer object for the hexagon.
+GLuint vao_hexagon;				 // Vertex array object for the hexagon.
+GLuint ebo_hexagon;				 // Element buffer object for the hexagon.
 
 // ** Texture IDs **
 GLuint texture_alien; // Texture ID for the first texture.
 
-// ***** Matrices *****
+// ***** Quad Matrices *****
 // * Translation *
-glm::vec3 quad_position1 = glm::vec3(0.0f, 0.0f, 0.0f);    // Move the quad to the right and up.
-glm::vec3 quad_position2 = glm::vec3(-0.5f, 0.5f, 0.0f);   // Move the quad to the left and up.
+glm::vec3 quad_position1 = glm::vec3(-0.35f, -0.5f, 0.0f); // Move the quad to the bottom left.
+glm::vec3 quad_position2 = glm::vec3(0.4f, -0.5f, 0.0f);  // Move the quad to the bottom right.
 glm::mat4 translation_matrix; // Translation matrix.
 
 // * Rotation *
-float quad_rotation_angle1 = 0;   // Rotate the quad by 45 degrees.
-float quad_rotation_angle2 = 0;   // Rotate the quad by 60 degrees.
-glm::mat4 rotation_matrix;            // Rotation matrix.
+float quad_rotation_angle1 = 0;   // No rotation.
+float quad_rotation_angle2 = 0;   // No rotation.
+glm::mat4 rotation_matrix;        // Rotation matrix.
 
 // * Scaling *
 glm::vec3 quad_scale1 = glm::vec3(0.5f, 0.5f, 1.0f);   // Scale the quad down to half its size.
-glm::vec3 quad_scale2 = glm::vec3(0.3f, 0.3f, 1.0f);   // Scale the quad down to 30% of its size.
-glm::mat4 scale_matrix; // Scale matrix.
+glm::vec3 quad_scale2 = glm::vec3(0.5f, 0.5f, 1.0f);
+glm::mat4 scale_matrix;                                       // Scale matrix.
 
 // ** Model Matrices **
 glm::mat4 model_matrix1; // Model matrix for the first quad.
 glm::mat4 model_matrix2; // Model matrix for the second quad.
+
+// ***** Hexagon Matrices *****
+// * Translation *
+glm::vec3 hexagon_position1 = glm::vec3(-0.35f, 0.5f, 0.0f);    // Move the hexagon to the top left.
+glm::vec3 hexagon_position2 = glm::vec3(0.45f, 0.5f, 0.0f);     // Move the hexagon to the top right.
+glm::mat4 hexagon_translation_matrix;                                 // Translation matrix.
+
+// * Rotation *
+float hexagon_rotation_angle1 = 0;
+float hexagon_rotation_angle2 = 0;   // No rotation, will be updated in the shader.
+glm::mat4 hexagon_rotation_matrix;   // Rotation matrix.
+
+// * Scaling *
+glm::vec3 hexagon_scale1 = glm::vec3(0.5f, 0.5f, 1.0f);   // Scale the hexagon down to half its size.
+glm::vec3 hexagon_scale2 = glm::vec3(0.3f, 0.3f, 1.0f);   // Scale the hexagon down to 30% of its size.
+glm::mat4 hexagon_scale_matrix;                                       // Scale matrix.
+
+// ** Model Matrices **
+glm::mat4 hexagon_model_matrix1; // Model matrix for the first hexagon.
+glm::mat4 hexagon_model_matrix2; // Model matrix for the second hexagon.
 
 // ** Utility Variables **
 GLfloat current_time; // Current time in seconds.
@@ -67,6 +90,28 @@ GLfloat current_time; // Current time in seconds.
  *      This includes setting up the window, creating the program object, loading the shaders, and creating the VBO.
  */
 void initial_setup();
+/**
+ * @brief
+ *      Initialize Hexagons
+ *
+ * @details
+ *      This function initializes the hexagon data and objects.
+ *
+ * @return
+ *      Returns the program ID.
+ */
+GLuint initialize_hexagons();
+/**
+ * @brief
+ *      Initialize Quads
+ *
+ * @details
+ *      This function initializes the quad data and objects.
+ *
+ * @return
+ *      Returns the program ID.
+ */
+GLuint initialize_quads();
 /**
  * @brief
  *      Update
@@ -147,80 +192,120 @@ int main()
 
 void initial_setup()
 {
-	// ** Vertex data **
-	GLfloat vertices_quad[] = {
-	//Index      // Position			// Color        // Texture Coordinates
-	/* 0*/	-0.5f,  0.5f, 0.0f,		1.0f, 0.0f, 0.0f,   0.0f, 1.0f, // Top - Left
-	/* 1*/	 0.5f,  0.5f, 0.0f,		0.0f, 1.0f, 0.0f,   1.0f, 1.0f, // Top - Right
-	/* 2*/	 0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,   1.0f, 0.0f, // Bottom - Right
-	/* 3*/	-0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 0.0f,   0.0f, 0.0f, // Bottom - Left
-	};
-
-	// Array of indices for the quad.
-	GLuint indices_quad[] = {
-		0, 1, 2, // First triangle (Top Left, Top Right, Bottom Right)
-		0, 2, 3  // Second triangle (Top Left, Bottom Right, Bottom Left)
-		// Triangles connected from top left to bottom right.
-	};
-
-	// ** Create Program & Load Shaders **
-	program_texture = c_shader_loader::create_program("Resources/Shaders/Texture.vert",
-	                                                  "Resources/Shaders/Texture.frag");
-
-	// *** Texture Loading ***
-	stbi_set_flip_vertically_on_load(true); // Flip textures on the y-axis.
-	int image_width, image_height, image_components; // Variables to store the image dimensions and components.
-	unsigned char* image_data = stbi_load("Resources/Textures/Alien.PNG", &image_width, &image_height, &image_components, 0); // Load the image data.
-
-	// *** VAO \ VBO \ EBO ***
-	// Generate the vertex array object
-	glGenVertexArrays(1, &vao_quad); // Generate a vertex array object name.
-	glBindVertexArray(vao_quad); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
-	// Generate the element buffer object
-	glGenBuffers(1, &ebo_quad); // Generate a buffer object name. This will be used to store the indices.
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_quad); // Bind the VBO to the GL_ARRAY_BUFFER target slot.
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_quad), indices_quad, GL_STATIC_DRAW); // Creates and initializes a buffer object's data store.
-	// Generate the vertex buffer object
-	glGenBuffers(1, &vbo_quad);  // Generate a buffer object name. This will be used to store the vertex data.
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_quad); // Bind the VBO to the GL_ARRAY_BUFFER target slot.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_quad), vertices_quad, GL_STATIC_DRAW); // Creates and initializes a buffer object's data store.
-
-	// ** Generate & Bind texture object **
-	glGenTextures(1, &texture_alien); // Generate a texture object.
-	glBindTexture(GL_TEXTURE_2D, texture_alien); // Bind the texture object to the target slot.
-	GLint loaded_components = (image_components == 3) ? GL_RGB : GL_RGBA; // Check how many components the image has.
-	glTexImage2D(GL_TEXTURE_2D, 0, loaded_components, image_width, image_height, 0, loaded_components, GL_UNSIGNED_BYTE, image_data); // Create the texture.
-	glGenerateMipmap(GL_TEXTURE_2D); // Generate mipmaps for the texture.
-
-	stbi_image_free(image_data); // Free the image data.
-	glBindTexture(GL_TEXTURE_2D, 0); // Unbind the texture object.
-
-	// ** Set up the vertex attributes **
-	/**
-	 * -- Note to self --
-	 * glVertexAttribPointer
-	 *
-	 * This needs to be called after creating the VBO and VAO.
-	 * When this is called its binding the VBO to the VAO.
-	 * After this when we use the VAO it will use the VBO that is bound to it.
-	 *
-	 *    @param 1: Index of the vertex attribute that is to be modified.
-	 *	  @param 2: Number of components per generic vertex attribute. 3 for x, y, z.
-	 *	  @param 3: Data type of each component in the array. GL_FLOAT for x, y, z.
-	 *    @param 4: Whether fixed-point data values should be normalized (GL_TRUE) or converted directly as fixed-point values (GL_FALSE) when they are accessed.
-	 *	  @param 5: Stride. Byte offset between consecutive generic vertex attributes. 6 * sizeof(GLfloat) for the three floats used for x, y, z in each vertex, and the three floats used for r, g, b in each vertex.
-	 *	  @param 6: Offset. Offset from the beginning of each vertex. 0/nullptr as the data is at the start of the array. casting to void pointer is just an untyped pointer, dont need to know the type.
-	 */
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr)); // Position attribute
-	glEnableVertexAttribArray(0);    // Enable the vertex attribute array.
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat))); // Color attribute
-	glEnableVertexAttribArray(1);    // Enable the color attribute array.
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(6 * sizeof(GLfloat))); // Texture Coordinates attribute
-	glEnableVertexAttribArray(2);    // Enable the texture coordinates attribute.
-
+	// ** Create Program, Load Shaders, Set up data **
+	program_texture = initialize_quads();
+	program_hexagon = initialize_hexagons();
 	// ** Prepare the window **
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the color of the window when the buffer is cleared. Grey.
 	glViewport(0, 0, window_width, window_height); // Maps the range of the window size to NDC space. This is the area that will be rendered to the screen. -1 to 1 on all axes.
+}
+
+GLuint initialize_hexagons()
+{
+	GLuint program = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
+	                                                         "Resources/Shaders/FadeColor.frag");
+	// ** Vertex data **
+	GLfloat vertices_hexagon[] = {
+		//Index      // Position		// Color
+		/* 0*/	     0.0f, 0.0f, 0.0f,	1.0f, 0.0f, 0.0f, // Center
+		/* 1*/	    -0.5f, 0.85f, 0.0f,	0.0f, 1.0f, 0.0f, // Top left
+		/* 2*/	     0.5f, 0.85f, 0.0f,	0.0f, 0.0f, 1.0f, // Top right
+		/* 3*/	     1.0f, 0.0f, 0.0f,	1.0f, 1.0f, 0.0f, // Right
+		/* 4*/	     0.5f, -0.85f, 0.0f,	0.0f, 1.0f, 1.0f, // Bottom right
+		/* 5*/	    -0.5f, -0.85f, 0.0f,	1.0f, 0.0f, 1.0f, // Bottom left
+		/* 6*/	    -1.0f, 0.0f, 0.0f,	0.5f, 0.5f, 0.5f, // Left
+	};
+
+	// Array of indices for the hexagon.
+	GLuint indices_hexagon[] = {
+		0, 1, 2, // First triangle (Center, Top Left, Top Right)
+		0, 2, 3, // Second triangle (Center, Top Right, Right)
+		0, 3, 4, // Third triangle (Center, Right, Bottom Right)
+		0, 4, 5, // Fourth triangle (Center, Bottom Right, Bottom Left)
+		0, 5, 6, // Fifth triangle (Center, Bottom Left, Left)
+		0, 6, 1  // Sixth triangle (Center, Left, Top Left)
+	};
+
+	// *** VAO \ VBO \ EBO ***
+	// Generate the vertex array object
+	glGenVertexArrays(1, &vao_hexagon); // Generate a vertex array object name.
+	glBindVertexArray(vao_hexagon); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
+	// Generate the element buffer object
+	glGenBuffers(1, &ebo_hexagon); // Generate a buffer object name. This will be used to store the indices.
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_hexagon); // Bind the VBO to the GL_ARRAY_BUFFER target slot.
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_hexagon), indices_hexagon, GL_STATIC_DRAW); // Creates and initializes a buffer object's data store.
+	// Generate the vertex buffer object
+	glGenBuffers(1, &vbo_hexagon);  // Generate a buffer object name. This will be used to store the vertex data.
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_hexagon); // Bind the VBO to the GL_ARRAY_BUFFER target slot.
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_hexagon), vertices_hexagon, GL_STATIC_DRAW); // Creates and initializes a buffer object's data store.
+
+	// ** Set up the vertex attributes **
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr)); // Position attribute
+	glEnableVertexAttribArray(0);    // Enable the vertex attribute array.
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat))); // Color attribute
+	glEnableVertexAttribArray(1);    // Enable the color attribute array.
+
+	return program;
+}
+
+GLuint initialize_quads()
+{
+	    GLuint program = c_shader_loader::create_program("Resources/Shaders/Texture.vert",
+                                                     "Resources/Shaders/Texture.frag");
+
+    // ** Vertex data **
+    GLfloat vertices_quad[] = {
+        // Positions          // Colors           // Texture Coords
+        -0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 2.0f, // Top Left
+         0.5f,  0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f, // Top Right
+         0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   2.0f, 0.0f, // Bottom Right
+        -0.5f, -0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f  // Bottom Left
+    };
+
+    GLuint indices_quad[] = {
+        0, 1, 2, // First triangle
+        2, 3, 0  // Second triangle
+    };
+
+    // *** VAO \ VBO \ EBO ***
+    glGenVertexArrays(1, &vao_quad);
+    glBindVertexArray(vao_quad);
+
+    glGenBuffers(1, &ebo_quad);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_quad);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_quad), indices_quad, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &vbo_quad);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_quad);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_quad), vertices_quad, GL_STATIC_DRAW);
+
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr));
+    glEnableVertexAttribArray(0);
+    // Color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+    // Texture Coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
+
+    // Load and create a texture
+    glGenTextures(1, &texture_alien);
+    glBindTexture(GL_TEXTURE_2D, texture_alien);
+
+	// Load the image data
+    int image_width, image_height, image_components;
+	stbi_set_flip_vertically_on_load(true);
+    unsigned char* image_data = stbi_load("Resources/Textures/alien.png", &image_width, &image_height, &image_components, 0);\
+
+	// Generate the texture & mipmap
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Free up the image data, and unbind the texture.
+    stbi_image_free(image_data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return program;
 }
 
 void update()
@@ -237,6 +322,17 @@ void update()
 	scale_matrix = glm::scale(glm::mat4(1.0f), quad_scale2);
 	model_matrix2 = translation_matrix * rotation_matrix * scale_matrix; // Collate the matrices into the model matrix.
 
+	// * First Hexagon Model Matrix *
+	hexagon_translation_matrix = glm::translate(glm::mat4(1.0f), hexagon_position1);
+	hexagon_rotation_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(hexagon_rotation_angle1), glm::vec3(0.0f, 0.0f, 1.0f));
+	hexagon_scale_matrix = glm::scale(glm::mat4(1.0f), hexagon_scale1);
+	hexagon_model_matrix1 = hexagon_translation_matrix * hexagon_rotation_matrix * hexagon_scale_matrix; // Collate the matrices into the model matrix.
+	// * Second Hexagon Model Matrix *
+	hexagon_translation_matrix = glm::translate(glm::mat4(1.0f), hexagon_position2);
+	hexagon_rotation_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(hexagon_rotation_angle2), glm::vec3(0.0f, 0.0f, 1.0f));
+	hexagon_scale_matrix = glm::scale(glm::mat4(1.0f), hexagon_scale2);
+	hexagon_model_matrix2 = hexagon_translation_matrix * hexagon_rotation_matrix * hexagon_scale_matrix; // Collate the matrices into the model matrix.
+
 	// *** Poll for events ***
 	glfwPollEvents(); // Updates any window events such as input or window resizing.
 	// ** update variables **
@@ -247,35 +343,53 @@ void render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffers.
 
-
 	// ***** Start of the rendering pipeline *****
-
-	glUseProgram(program_texture);	// Start using the program object. This activates the shader program.
-	glBindVertexArray(vao_quad);        // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
 
 	// ** Texture **
 	glActiveTexture(GL_TEXTURE0); // Activate texture unit 0.
 	glBindTexture(GL_TEXTURE_2D, texture_alien); // Bind the texture object to the target slot.
 	glUniform1i(glGetUniformLocation(program_texture, "texture_0"), 0); // Set the texture sampler to use texture unit 0.
 
-	// ** Send Uniforms **
-	// * Time *
-	GLint current_time_loc = glGetUniformLocation(program_texture, "current_time"); // Get the location of the uniform variable in the shader.
-	glUniform1f(current_time_loc, current_time); // Set the value of the uniform variable.
-	// * Model Matrix *
-	GLint model_matrix_loc = glGetUniformLocation(program_texture, "model_matrix"); // Get the location of the uniform variable in the shader.
-
 
 	// *** Drawing ***
-	// render first quad
-	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(model_matrix1)); // Pass the model matrix to the shader.
+
+	// ** Quads **
+	glUseProgram(program_texture);	    // Start using the program object. This activates the shader program.
+	glBindVertexArray(vao_quad);        // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
+	// * render first quad *
+	GLint model_matrix_loc = glGetUniformLocation(program_texture, "model_matrix");
+
+	// Make the first quad mirror the texture when it goes out of bounds.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(model_matrix1));
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr); // Draw quad. 6 indices, 2 triangles, 3 vertices each.
-	// render second quad
-	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(model_matrix2)); // Pass the model matrix to the shader.
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr); // Draw quad. 6 indices, 2 triangles, 3 vertices each.
+	// * render second quad *
+	// Make the second quad draw the texture normally.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(model_matrix2));
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+	// ** Hexagons **
+	glUseProgram(program_hexagon);	       // Start using the program object. This activates the shader program.
+	glBindVertexArray(vao_hexagon);        // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
+	// * render first hexagon *
+	model_matrix_loc = glGetUniformLocation(program_hexagon, "model_matrix");
+	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(hexagon_model_matrix1));
+	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, nullptr); // Draw hexagon. 18 indices, 6 triangles, 3 vertices each.
+	// * render second hexagon *
+	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(hexagon_model_matrix2));
+	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, nullptr);
+
+
+	// Send the current time to the shader.
+	GLint current_time_loc = glGetUniformLocation(program_hexagon, "current_time");
+	glUniform1f(current_time_loc, current_time);
 
 	// ***** End of the rendering pipeline *****
-
 
 	glBindVertexArray(0); // Unbind the VAO.
 	glUseProgram(0); // Stop using the program object. Deactivate the program object.
