@@ -19,7 +19,6 @@ class c_shader_loader
 public:
 
 	// ** Public Methods **
-
 	/**
 	 * @brief
 	 *      Loads and compiles the shaders from the file paths provided.
@@ -37,7 +36,6 @@ public:
 private:
 
 	// ** Constructors / Destructors **
-
 	/**
 	 * @brief
 	 *		Default constructor.
@@ -50,7 +48,6 @@ private:
 	~c_shader_loader(void);
 
 	// ** Private Methods **
-
 	/**
 	 * @brief
 	 *		Creates a shader object from the shader type and file path provided.

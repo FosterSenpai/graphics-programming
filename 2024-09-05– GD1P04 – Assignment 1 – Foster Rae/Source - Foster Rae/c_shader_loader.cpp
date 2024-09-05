@@ -16,13 +16,12 @@ Mail : Foster.Rae@mds.ac.nz
 #include<vector>
 
 // *** Constructors / Destructors ***
-
 c_shader_loader::c_shader_loader(void) = default;
 
 c_shader_loader::~c_shader_loader(void) = default;
 
-// *** Functions ***
 
+// *** Functions ***
 GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const char* fragment_shader_filename)
 {
 	// Create the shaders from the filepath.

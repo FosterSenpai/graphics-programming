@@ -141,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="c_shader_loader.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\FadeColor.frag" />
