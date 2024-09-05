@@ -74,10 +74,49 @@ GLfloat current_time; // Current time in seconds.
 
 // ***** Function Declarations *****
 
+/**
+ * @brief
+ *      Handles the initial setup of the program.
+ *
+ *  @details
+ *      This function is called once at the start of the program and is used to set up the initial state of the program.
+ *      This includes setting up the window, creating the program object, loading the shaders, and creating the VBO.
+ */
 void initial_setup();
+/**
+ * @brief
+ *      Update
+ *
+ * @details
+ *       This function is called once per frame and is used to update the state of the program.
+ */
 void update();
+/**
+ * @brief
+ *       Render the scene
+ * @details
+ * 		Renders all the objects in the scene, this is called once per frame with the update function.
+ */
 void render();
-
+/**
+ * @brief
+ *      Initialize GLFW
+ *
+ * @details
+ *      This function initializes GLFW and sets the window hints.
+ */
+void initialize_glfw();
+/**
+ * @brief
+ *      Initialize GLEW
+ *
+ * @details
+ *      This function initializes GLEW and checks if it was successful.
+ *
+ * @return
+ *      Returns an error code if GLEW failed to initialize.
+ */
+int initialize_glew();
 
 
 // ***** Main Function *****
@@ -85,10 +124,7 @@ void render();
 int main()
 {
 	// *** Initialise GLFW ***
-	glfwInit(); // Must be called before any other GLFW functions.
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	initialize_glfw();
 
 	//  *** Create a window context ***
 	window = glfwCreateWindow(window_width, window_height, "Graphics Framework", nullptr, nullptr);
@@ -101,22 +137,11 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 
-	// *** Initialise GLEW ***
-	/*
-	* -- Note to self --
-	* glewInit
-	* This function must be called after the initialization of the GLFW window and before any OpenGL functions are called.
-	* This populates all the OpenGL function pointers with the correct functions that are supported by the graphics card.
-	*/
-	if (glewInit() != GLEW_OK)
-	{
-		// Terminate GLFW if GLEW failed to initialise.
-		std::cout << "Failed to initialise GLEW" << '\n';
-		std::cin.get();
-
-		glfwTerminate();
-		return -1;
-	}
+    // *** Initialise GLEW ***
+    if (initialize_glew() == -1)
+    {
+        return -1; // Return an error code if GLEW initialization failed. (I feel like I might be making this check twice)
+    }
 
 	// *** Initial Setup ***
 	initial_setup();
@@ -134,19 +159,8 @@ int main()
 }
 
 
-
-
-
 // ***** Function Definitions *****
 
-/**
- * @brief
- *      Handles the initial setup of the program.
- *
- *  @details
- *      This function is called once at the start of the program and is used to set up the initial state of the program.
- *      This includes setting up the window, creating the program object, loading the shaders, and creating the VBO.
- */
 void initial_setup()
 {
 	// Load shaders, Create program object
@@ -212,13 +226,6 @@ void initial_setup()
 	glViewport(0, 0, window_width, window_height); // Maps the range of the window size to NDC space. This is the area that will be rendered to the screen. -1 to 1 on all axes.
 }
 
-/**
- * @brief
- *      Update
- *
- * @details
- *       This function is called once per frame and is used to update the state of the program.
- */
 void update()
 {
 	// *** Calculate Matrices ***
@@ -239,12 +246,6 @@ void update()
 	current_time = static_cast<float>(glfwGetTime()); // Get the current time in seconds.
 }
 
-/**
- * @brief
- *       Render the scene
- * @details
- * 		Renders all the objects in the scene, this is called once per frame with the update function.
- */
 void render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffers.
@@ -283,3 +284,31 @@ void render()
 	glUseProgram(0); // Stop using the program object. Deactivate the program object.
 	glfwSwapBuffers(window); // Swap the front and back buffers. End of the rendering pipeline.
 };
+
+void initialize_glfw()
+{
+	glfwInit(); // Must be called before any other GLFW functions.
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+}
+
+int initialize_glew()
+{
+    /*
+    * -- Note to self --
+    * glewInit
+    * This function must be called after the initialization of the GLFW window and before any OpenGL functions are called.
+    * This populates all the OpenGL function pointers with the correct functions that are supported by the graphics card.
+    */
+    if (glewInit() != GLEW_OK)
+    {
+        // Terminate GLFW if GLEW failed to initialise.
+        std::cout << "Failed to initialise GLEW" << '\n';
+        std::cin.get();
+
+        glfwTerminate();
+        return -1; // Return an error code.
+    }
+    return 0; // Return 0 if initialization is successful.
+}
