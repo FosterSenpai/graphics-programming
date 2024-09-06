@@ -3,12 +3,14 @@
 in vec3 fragment_color; // Input color from vertex shader.
 in float fragment_time;
 
+uniform vec3 blend_color;
+
 out vec4 final_color; // Output color to the framebuffer after doing stuff.
 
 void main()
 {
     // Use the sine function to make the color fade in and out.
-    // The sine function returns a value between -1 and 1, so we multiply by 0.5 and add 0.5 to get a value between 0 and 1. (surely this is right Callan)
-    final_color = vec4(fragment_color, 1.0f) * (sin(fragment_time) * 0.5 + 0.5);
-	// Clamp would give a smoother fade.
+    float fade_factor = sin(fragment_time) * 0.5 + 0.5;
+    vec3 mixed_color = mix(fragment_color, blend_color, fade_factor); // Blend the colors
+    final_color = vec4(mixed_color, 1.0f);
 }

@@ -7,6 +7,8 @@ layout (location = 1) in vec3 color;
 // Inputs
 uniform mat4 model_matrix;
 uniform float current_time;
+uniform vec3 input_color;
+uniform vec3 colors[7]; // Array of colors
 
 // Outputs to fragment shader
 out vec3 fragment_color;
@@ -32,6 +34,6 @@ void main()
     gl_Position = model_matrix * rotated_position;
 
     // Pass the color and time to the fragment shader
-    fragment_color = color;
+    fragment_color =  colors[gl_VertexID % 7]; // Use vertex ID to select color
     fragment_time = current_time;
 }

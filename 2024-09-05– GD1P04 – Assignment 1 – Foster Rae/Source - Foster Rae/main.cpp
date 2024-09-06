@@ -76,6 +76,16 @@ glm::mat4 hexagon_scale_matrix;                                       // Scale m
 glm::mat4 hexagon_model_matrix1; // Model matrix for the first hexagon.
 glm::mat4 hexagon_model_matrix2; // Model matrix for the second hexagon.
 
+// ** Color array **
+glm::vec3 colors[] = {
+    glm::vec3(1.0f, 0.0f, 0.0f), // Red
+    glm::vec3(0.0f, 1.0f, 0.0f), // Green
+    glm::vec3(0.0f, 0.0f, 1.0f), // Blue
+    glm::vec3(1.0f, 1.0f, 0.0f), // Yellow
+    glm::vec3(1.0f, 0.0f, 1.0f), // Magenta
+    glm::vec3(0.0f, 0.0f, 0.0f)  // Black
+};
+
 // ** Utility Variables **
 GLfloat current_time; // Current time in seconds.
 
@@ -157,7 +167,6 @@ int main()
 
 	//  *** Create a window context ***
 	window = glfwCreateWindow(window_width, window_height, "Graphics Framework", nullptr, nullptr);
-	// Check if the window was created successfully.
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << '\n';
@@ -183,7 +192,7 @@ int main()
 	}
 
 	// *** End of main loop. Terminate the program ***
-	glfwTerminate(); // Terminate GLFW and close the window.
+	glfwTerminate();
 	return 0;
 }
 
@@ -196,8 +205,8 @@ void initial_setup()
 	program_texture = initialize_quads();
 	program_hexagon = initialize_hexagons();
 	// ** Prepare the window **
-	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the color of the window when the buffer is cleared. Grey.
-	glViewport(0, 0, window_width, window_height); // Maps the range of the window size to NDC space. This is the area that will be rendered to the screen. -1 to 1 on all axes.
+	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
+	glViewport(0, 0, window_width, window_height); // Maps the range of the window size to NDC space.
 }
 
 GLuint initialize_hexagons()
@@ -206,14 +215,14 @@ GLuint initialize_hexagons()
 	                                                         "Resources/Shaders/FadeColor.frag");
 	// ** Vertex data **
 	GLfloat vertices_hexagon[] = {
-		//Index      // Position		// Color
-		/* 0*/	     0.0f, 0.0f, 0.0f,	1.0f, 0.0f, 0.0f, // Center
-		/* 1*/	    -0.5f, 0.85f, 0.0f,	0.0f, 1.0f, 0.0f, // Top left
-		/* 2*/	     0.5f, 0.85f, 0.0f,	0.0f, 0.0f, 1.0f, // Top right
-		/* 3*/	     1.0f, 0.0f, 0.0f,	1.0f, 1.0f, 0.0f, // Right
-		/* 4*/	     0.5f, -0.85f, 0.0f,	0.0f, 1.0f, 1.0f, // Bottom right
-		/* 5*/	    -0.5f, -0.85f, 0.0f,	1.0f, 0.0f, 1.0f, // Bottom left
-		/* 6*/	    -1.0f, 0.0f, 0.0f,	0.5f, 0.5f, 0.5f, // Left
+		//Index      // Position		    // Color
+		/* 0*/	     0.0f,   0.0f, 0.0f,	    0.0f, 0.0f, 0.0f, // Center
+		/* 1*/	    -0.5f,  0.85f, 0.0f,	    0.0f, 0.0f, 0.0f, // Top left
+		/* 2*/	     0.5f,  0.85f, 0.0f,	    0.0f, 0.0f, 0.0f, // Top right
+		/* 3*/	     1.0f,   0.0f, 0.0f,	    0.0f, 0.0f, 0.0f, // Right
+		/* 4*/	     0.5f, -0.85f, 0.0f,        0.0f, 0.0f, 0.0f, // Bottom right
+		/* 5*/	    -0.5f, -0.85f, 0.0f,        0.0f, 0.0f, 0.0f, // Bottom left
+		/* 6*/	    -1.0f,   0.0f, 0.0f,	    0.0f, 0.0f, 0.0f, // Left
 	};
 
 	// Array of indices for the hexagon.
@@ -227,17 +236,17 @@ GLuint initialize_hexagons()
 	};
 
 	// *** VAO \ VBO \ EBO ***
-	// Generate the vertex array object
-	glGenVertexArrays(1, &vao_hexagon); // Generate a vertex array object name.
-	glBindVertexArray(vao_hexagon); // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
-	// Generate the element buffer object
-	glGenBuffers(1, &ebo_hexagon); // Generate a buffer object name. This will be used to store the indices.
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_hexagon); // Bind the VBO to the GL_ARRAY_BUFFER target slot.
+	// Generate & bind the vertex array object
+	glGenVertexArrays(1, &vao_hexagon);
+	glBindVertexArray(vao_hexagon);
+	// Generate & bind the element buffer object
+	glGenBuffers(1, &ebo_hexagon);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_hexagon);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_hexagon), indices_hexagon, GL_STATIC_DRAW); // Creates and initializes a buffer object's data store.
-	// Generate the vertex buffer object
-	glGenBuffers(1, &vbo_hexagon);  // Generate a buffer object name. This will be used to store the vertex data.
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_hexagon); // Bind the VBO to the GL_ARRAY_BUFFER target slot.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_hexagon), vertices_hexagon, GL_STATIC_DRAW); // Creates and initializes a buffer object's data store.
+	// Generate & bind the vertex buffer object
+	glGenBuffers(1, &vbo_hexagon);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_hexagon);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_hexagon), vertices_hexagon, GL_STATIC_DRAW);
 
 	// ** Set up the vertex attributes **
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr)); // Position attribute
@@ -245,7 +254,7 @@ GLuint initialize_hexagons()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat))); // Color attribute
 	glEnableVertexAttribArray(1);    // Enable the color attribute array.
 
-	return program;
+	return program; // Pass the program ID back to main.
 }
 
 GLuint initialize_quads()
@@ -268,26 +277,25 @@ GLuint initialize_quads()
     };
 
     // *** VAO \ VBO \ EBO ***
+	// Generate & bind the vertex array object
     glGenVertexArrays(1, &vao_quad);
     glBindVertexArray(vao_quad);
-
+	// Generate & bind the element buffer object
     glGenBuffers(1, &ebo_quad);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_quad);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_quad), indices_quad, GL_STATIC_DRAW);
-
+	// Generate & bind the vertex buffer object
     glGenBuffers(1, &vbo_quad);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_quad);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_quad), vertices_quad, GL_STATIC_DRAW);
 
-    // Position attribute
+    // Set up the vertex attributes
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr));
-    glEnableVertexAttribArray(0);
-    // Color attribute
+    glEnableVertexAttribArray(0); // Position attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(1);
-    // Texture Coord attribute
+    glEnableVertexAttribArray(1); // Color attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(6 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(2); // Texture attribute (UVs)
 
     // Load and create a texture
     glGenTextures(1, &texture_alien);
@@ -296,7 +304,8 @@ GLuint initialize_quads()
 	// Load the image data
     int image_width, image_height, image_components;
 	stbi_set_flip_vertically_on_load(true);
-    unsigned char* image_data = stbi_load("Resources/Textures/alien.png", &image_width, &image_height, &image_components, 0);\
+    unsigned char* image_data = stbi_load("Resources/Textures/alien.png", &image_width, &image_height,
+                                          &image_components, 0);
 
 	// Generate the texture & mipmap
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
@@ -361,13 +370,13 @@ void render()
 
 	// Make the first quad mirror the texture when it goes out of bounds.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT); // Call again invert
 
 	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(model_matrix1));
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr); // Draw quad. 6 indices, 2 triangles, 3 vertices each.
 	// * render second quad *
 	// Make the second quad draw the texture normally.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // Grab one corner for animating.
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(model_matrix2));
@@ -384,6 +393,20 @@ void render()
 	glUniformMatrix4fv(model_matrix_loc, 1, GL_FALSE, glm::value_ptr(hexagon_model_matrix2));
 	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, nullptr);
 
+	// Send the array of colors to the shader.
+    GLint colors_loc = glGetUniformLocation(program_hexagon, "colors");
+    glUniform3fv(colors_loc, 7, glm::value_ptr(colors[0]));
+
+	// Send the input color to the shader.
+    GLint input_color_loc = glGetUniformLocation(program_hexagon, "input_color");
+    glUniform3f(input_color_loc, 1.0f, 0.0f, 0.0f); // Example: Red color
+
+    // Send the blend color to the shader.
+    GLint blend_color_loc = glGetUniformLocation(program_hexagon, "blend_color");
+	// Loop through the colors and send them to the shader
+	for (const auto& color : colors) {
+	    glUniform3f(blend_color_loc, color.r, color.g, color.b);
+	}
 
 	// Send the current time to the shader.
 	GLint current_time_loc = glGetUniformLocation(program_hexagon, "current_time");
