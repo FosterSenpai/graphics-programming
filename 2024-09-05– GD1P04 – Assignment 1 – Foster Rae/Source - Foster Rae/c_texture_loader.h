@@ -24,7 +24,8 @@ public:
 	/**
 	 * @brief Loads an image from the file path provided.
 	 *  @note The image is loaded using stb_image.h. \n
-	 *	      Remember to free the image data after use with stbi_image_free().
+	 *	      Remember to free the image data after use with stbi_image_free(). \n
+	 *		  Remember stbi_set_flip_vertically_on_load() before loading the image if needed.
 	 *
 	 *	@param file_path The file path to the image.
 	 *	@param width Variable to store the width of the image.

@@ -5,8 +5,6 @@
 // == Public Methods ==
 unsigned char* c_texture_loader::load_image(const char* file_path, int* width, int* height, int* components)
 {
-	// Flip the image vertically.
-	stbi_set_flip_vertically_on_load(true);
 	// Load the image and return the data.
 	unsigned char* image_data = stbi_load(file_path, width, height, components, 0);
 	// Check if the image data is valid.

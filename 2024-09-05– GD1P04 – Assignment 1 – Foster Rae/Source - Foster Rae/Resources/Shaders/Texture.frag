@@ -6,6 +6,7 @@ in vec2 frag_tex_coords;
 
 // Uniform inputs
 uniform sampler2D texture_0;
+uniform sampler2D texture_1;
 
 // Output
 out vec4 final_color;
