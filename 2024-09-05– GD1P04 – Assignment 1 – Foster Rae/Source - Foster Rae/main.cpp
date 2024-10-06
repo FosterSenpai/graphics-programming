@@ -9,15 +9,14 @@ Description : Entrance point for the OpenGL pipeline.
 Author : Foster Rae
 Mail : Foster.Rae@mds.ac.nz
 ************************************************************************/
-
 #include <iostream>
 #include "c_shader_loader.h"
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include "stb_image.h"
-// ***** Globals *****
 
+// ***** Globals *****
 // ** Window Variables **
 GLFWwindow* window = nullptr;
 int window_height = 800;
@@ -52,7 +51,7 @@ glm::vec3 quad_scale1 = glm::vec3(0.5f, 0.5f, 1.0f);   // Scale the quad down to
 glm::vec3 quad_scale2 = glm::vec3(0.5f, 0.5f, 1.0f);
 glm::mat4 scale_matrix;                                       // Scale matrix.
 
-// ** Model Matrices **
+// ** Quad Model Matrices **
 glm::mat4 model_matrix1; // Model matrix for the first quad.
 glm::mat4 model_matrix2; // Model matrix for the second quad.
 
@@ -72,7 +71,7 @@ glm::vec3 hexagon_scale1 = glm::vec3(0.5f, 0.5f, 1.0f);   // Scale the hexagon d
 glm::vec3 hexagon_scale2 = glm::vec3(0.3f, 0.3f, 1.0f);   // Scale the hexagon down to 30% of its size.
 glm::mat4 hexagon_scale_matrix;                                       // Scale matrix.
 
-// ** Model Matrices **
+// ** Hexagon Model Matrices **
 glm::mat4 hexagon_model_matrix1; // Model matrix for the first hexagon.
 glm::mat4 hexagon_model_matrix2; // Model matrix for the second hexagon.
 
@@ -90,7 +89,6 @@ glm::vec3 colors[] = {
 GLfloat current_time; // Current time in seconds.
 
 // ***** Function Declarations *****
-
 /**
  * @brief
  *      Handles the initial setup of the program.
@@ -156,9 +154,50 @@ void initialize_glfw();
  *      Returns an error code if GLEW failed to initialize.
  */
 int initialize_glew();
+/**
+ * @brief
+ *      Load Image
+ *
+ * @details
+ *      This function loads an image from the file path provided.
+ *
+ * @param file_path
+ *      The file path to the image as a string.
+ * @param width
+ *      Variable to store the width of the image, pass pointer to the variable.
+ * @param height
+ *      Variable to store the height of the image, pass pointer to the variable.
+ * @param components
+ *       Variable to store the number of components in the image, pass pointer to the variable.
+ *
+ * @return
+ *      The image data.
+ */
+unsigned char* load_image(const char* file_path, int* width, int* height, int* components);
+/**
+ * @brief
+ *      Create a Texture.
+ *
+ * @details
+ *      This function creates a texture from the image data provided.
+ *
+ * @param image_data
+ *      The image data.
+ * @param width
+ *      The width of the image.
+ * @param height
+ *      The height of the image.
+ * @param components
+ *      The number of components in the image.
+ *
+ * @note Pass the image data, width, height, and components from the load_image function.\n
+ *		 Adds mipmapping and linear sampling to the texture.
+ *
+ * @return
+ *      The generated texture object as a GLuint.
+ */
+GLuint create_texture(const unsigned char* image_data, const int width, const int height, const int components);
 
-
-// ***** Main Function *****
 
 int main()
 {
@@ -198,7 +237,6 @@ int main()
 
 
 // ***** Function Definitions *****
-
 void initial_setup()
 {
 	// ** Create Program, Load Shaders, Set up data **
@@ -211,6 +249,7 @@ void initial_setup()
 
 GLuint initialize_hexagons()
 {
+	// Create the program object.
 	GLuint program = c_shader_loader::create_program("Resources/Shaders/PositionOnly.vert",
 	                                                         "Resources/Shaders/FadeColor.frag");
 	// ** Vertex data **
@@ -259,7 +298,8 @@ GLuint initialize_hexagons()
 
 GLuint initialize_quads()
 {
-	    GLuint program = c_shader_loader::create_program("Resources/Shaders/Texture.vert",
+	// Create the program object.
+	GLuint program = c_shader_loader::create_program("Resources/Shaders/Texture.vert",
                                                      "Resources/Shaders/Texture.frag");
 
     // ** Vertex data **
@@ -297,23 +337,16 @@ GLuint initialize_quads()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(6 * sizeof(GLfloat)));
     glEnableVertexAttribArray(2); // Texture attribute (UVs)
 
-    // Load and create a texture
-    glGenTextures(1, &texture_alien);
-    glBindTexture(GL_TEXTURE_2D, texture_alien);
-
-	// Load the image data
+    // Load the image data
     int image_width, image_height, image_components;
-	stbi_set_flip_vertically_on_load(true);
-    unsigned char* image_data = stbi_load("Resources/Textures/alien.png", &image_width, &image_height,
-                                          &image_components, 0);
+    unsigned char* image_data = load_image("Resources/Textures/alien.png", &image_width, &image_height, &image_components);
 
-	// Generate the texture & mipmap
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    // Create the texture
+    texture_alien = create_texture(image_data, image_width, image_height, image_components);
 
-	// Free up the image data, and unbind the texture.
+    // Free up the image data
     stbi_image_free(image_data);
-    glBindTexture(GL_TEXTURE_2D, 0);
+
     return program;
 }
 
@@ -361,7 +394,6 @@ void render()
 
 
 	// *** Drawing ***
-
 	// ** Quads **
 	glUseProgram(program_texture);	    // Start using the program object. This activates the shader program.
 	glBindVertexArray(vao_quad);        // Bind to the VAO target slot. Subsequent VAO operations will affect this VAO.
@@ -445,4 +477,33 @@ int initialize_glew()
         return -1; // Return an error code.
     }
     return 0; // Return 0 if initialization is successful.
+}
+
+unsigned char* load_image(const char* file_path, int* width, int* height, int* components)
+{
+    stbi_set_flip_vertically_on_load(true);
+    return stbi_load(file_path, width, height, components, 0);
+}
+
+GLuint create_texture(const unsigned char* image_data, const int width, const int height, const int components)
+{
+    GLuint texture; // Create a texture object.
+    glGenTextures(1, &texture); // Generate a texture object.
+    glBindTexture(GL_TEXTURE_2D, texture); // Bind the texture object to the target slot.
+	 
+    // Set the filtering and mipmap parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Check how many components the loaded image has
+    GLint loaded_components = (components == 4) ? GL_RGBA : GL_RGB;
+
+    // Generate the texture & mipmap
+    glTexImage2D(GL_TEXTURE_2D, 0, loaded_components, width, height, 0, loaded_components, GL_UNSIGNED_BYTE, image_data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    // Unbind the texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return texture; // Pass the generated texture back to the caller.
 }
