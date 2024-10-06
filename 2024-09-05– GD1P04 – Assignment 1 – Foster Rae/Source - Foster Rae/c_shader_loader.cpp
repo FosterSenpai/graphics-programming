@@ -1,27 +1,13 @@
-/***********************************************************************
-Bachelor of Software Engineering
-Media Design School
-Auckland
-New Zealand
-(c) 2024 Media Design School
-File Name :cShaderLoader.cpp
-Description : Implementation for the cShaderLoader class.
-Author : Foster Rae
-Mail : Foster.Rae@mds.ac.nz
-************************************************************************/
-
 #include "c_shader_loader.h"
 #include<iostream>
 #include<fstream>
 #include<vector>
 
-// *** Constructors / Destructors ***
+// == Constructors / Destructors ==
 c_shader_loader::c_shader_loader(void) = default;
-
 c_shader_loader::~c_shader_loader(void) = default;
 
-
-// *** Functions ***
+// == Public Methods ==
 GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const char* fragment_shader_filename)
 {
 	// Create the shaders from the filepath.
@@ -31,13 +17,13 @@ GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const
 	// Create the program handle, attach the shaders and link it.
 	GLuint program = glCreateProgram();			// create a program object.
 	glAttachShader(program, vertex_shader);		// attach the vertex shader.
-	glAttachShader(program, fragment_shader);    // attach the fragment shader.
+	glAttachShader(program, fragment_shader);   // attach the fragment shader.
 	glLinkProgram(program); 					// link the shaders into a complete program.
 
-	// ** Check for link errors **
+	// Check for linking errors.
 	int link_result = 0;
-	glGetProgramiv(program, GL_LINK_STATUS, &link_result);    // get program link status.
-	if (link_result == GL_FALSE)                				   // if the program failed to link.
+	glGetProgramiv(program, GL_LINK_STATUS, &link_result);
+	if (link_result == GL_FALSE)
 	{
 		// Get error details and print them.
 		std::string programName = vertex_shader_filename + *fragment_shader_filename;
@@ -45,45 +31,47 @@ GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const
 		return 0;
 	}
 
-	// ** Delete Shaders **
-	glDeleteShader(vertex_shader); 	   // delete the vertex shader.
+	// Detach the shaders and delete them.
+	glDeleteShader(vertex_shader); 	    // delete the vertex shader.
 	glDeleteShader(fragment_shader);    // delete the fragment shader.
 
-	return program; 				   // return the program ID.
+	return program; 				    // return the program ID.
 }
 
+// == Private Methods ==
 GLuint c_shader_loader::create_shader(GLenum shader_type, const char* shader_name)
 {
-	// ** Create shader object and populate with shader code **
-	std::string shader_code = read_shader_file(shader_name);  		 // Save the shader code as a string.
+	// Create shader object and populate with shader code.
+	std::string shader_code = read_shader_file(shader_name);  		     // Save the shader code as a string.
 
 	// Create the shader ID and create pointers for source code string and length.
-	GLuint shader_id = glCreateShader(shader_type);					 // Create a shader object with the enum 'shader_type' provided.
-	const char* p_shader_code = shader_code.c_str(); 				 // Create a pointer to the shader code, convert the string to a char array.
-	const int code_length = static_cast<int>(shader_code.size());    // Save the length of the shader code, need for glShaderSource so it knows how many characters to read.
+	GLuint shader_id = glCreateShader(shader_type);					     // Create a shader object with the enum 'shader_type' provided.
+	const char* p_shader_code = shader_code.c_str(); 				     // Create a pointer to the shader code, convert the string to a char array.
+	const int code_length = static_cast<int>(shader_code.size());        // Save the length of the shader code, need for glShaderSource so it knows how many characters to read.
 
 	// Populate the Shader Object (ID) and compile.
 	glShaderSource(shader_id, 1, &p_shader_code, &code_length);	 // Populate the shader object with the shader code.
 	glCompileShader(shader_id);                                          // Compile the shader.
 
-	// ** Check for compile errors **
+	// Check for compilation errors.
 	int compile_result = 0;
-	glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_result);    // Get the shader compile status.
+	glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_result);
 	if (compile_result == GL_FALSE)
 	{
-		print_error_details(true, shader_id, shader_name);        // Get error details and print them.
+		// Get error details and print them.
+		print_error_details(true, shader_id, shader_name);
 		return 0;
 	}
-	return shader_id;                                                      // Return the shader ID.
-}
 
+	return shader_id; // Return the GLuint ID of the compiled shader.
+}
 std::string c_shader_loader::read_shader_file(const char* filename)
 {
-	// ** Open the file for reading **
+	// Open the file and read the contents into a string.
 	std::ifstream file(filename, std::ios::in);
 	std::string shader_code;
 
-	// Ensure the file is open and readable.
+	// Check if the file was opened successfully.
 	if (!file.good()) {
 		std::cout << "Cannot read file:  " << filename << '\n';
 		return "";
@@ -99,7 +87,6 @@ std::string c_shader_loader::read_shader_file(const char* filename)
 	file.close(); 											// close the file.
 	return shader_code; 									// return the shader code.
 }
-
 void c_shader_loader::print_error_details(bool is_shader, GLuint id, const char* name)
 {
 	int info_log_length = 0;

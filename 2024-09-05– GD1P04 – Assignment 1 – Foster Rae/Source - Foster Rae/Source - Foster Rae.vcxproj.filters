@@ -12,21 +12,45 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{3756b9ab-8f64-48b0-8ad8-eb2bff556b26}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libs">
+      <UniqueIdentifier>{72212333-049e-40ba-be26-0124dfa07cc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Class Implementations">
+      <UniqueIdentifier>{a7646077-2bfb-4279-bca9-ee04f682ec75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="c_shader_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="c_graphics_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="c_texture_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="c_transformations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="c_shader_loader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="image_loader.cpp">
+      <Filter>Libs</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="image_loader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="c_transformations.cpp">
+      <Filter>Source Files\Class Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="c_graphics_utils.cpp">
+      <Filter>Source Files\Class Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="c_texture_loader.cpp">
+      <Filter>Source Files\Class Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="c_shader_loader.cpp">
+      <Filter>Source Files\Class Implementations</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
