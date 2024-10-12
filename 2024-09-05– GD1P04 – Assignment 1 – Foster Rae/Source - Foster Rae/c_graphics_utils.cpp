@@ -8,7 +8,7 @@ void c_graphics_utils::initialize_glfw()
 	// Initialize GLFW.
 	glfwInit();
 	// Set window hint to OpenGL 4.6.
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 }
@@ -42,26 +42,32 @@ GLFWwindow* c_graphics_utils::create_window(int width, int height, const char* t
 	glfwMakeContextCurrent(window);
 	return window; // Return the window if it was successfully created.
 }
-
 GLuint c_graphics_utils::initialize_quads(GLuint& quad_vao, GLuint& quad_vbo, GLuint& quad_ebo, GLuint& texture_id1, GLuint& texture_id2)
 {
 			// Create the program object.
-	GLuint program = c_shader_loader::create_program("Resources/Shaders/Texture.vert",
-                                                     "Resources/Shaders/Texture.frag");
+	GLuint program = c_shader_loader::create_program("Resources/Shaders/Exercise.vert",
+                                                     "Resources/Shaders/Exercise.frag");
 
-    // ** Vertex data **
-    GLfloat vertices_quad[] = {
-        // Positions          // Colors           // Texture Coords
-        -0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 2.0f, // Top Left
-         0.5f,  0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 2.0f, // Top Right
-         0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   2.0f, 0.0f, // Bottom Right
-        -0.5f, -0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f  // Bottom Left
-    };
+	// Vertex data for two quads
+	GLfloat vertices_quad[] = {
+	    // Positions        // Colors         // Texture Coords
+	    // Quad 1 (Centered Sprite)
+	    -0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, // Top-left
+	     0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // Top-right
+	     0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f, // Bottom-right
+	    -0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 0.0f, // Bottom-left
 
-    GLuint indices_quad[] = {
-        0, 1, 2, // First triangle
-        2, 3, 0  // Second triangle
-    };
+	    // Quad 2 (Repeated Texture)
+	    -0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 2.0f, // Top-left
+	     0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  2.0f, 2.0f, // Top-right
+	     0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  2.0f, 0.0f, // Bottom-right
+	    -0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 0.0f  // Bottom-left
+	};
+
+	GLuint indices_quad[] = {
+	    0, 1, 2, 2, 3, 0, // Quad 1
+	    4, 5, 6, 6, 7, 4  // Quad 2
+	};
 
     // *** VAO \ VBO \ EBO ***
 	// Generate & bind the vertex array object

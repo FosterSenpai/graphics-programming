@@ -24,10 +24,13 @@ public:
 	// == Public Methods ==
 	/**
 	 * @brief Initializes GLFW.
+	 * @note Call this before initializing GLEW.
 	 */
 	void static initialize_glfw();
 	/**
 	 * @brief Initializes GLEW.
+	 *
+	 * @return 0 if initialization is successful, -1 if it fails.
 	 */
 	int static initialize_glew();
 	/**
