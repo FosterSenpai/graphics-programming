@@ -43,5 +43,12 @@ public:
 	 * @return The texture ID.
 	 */
 	static GLuint create_texture(const unsigned char* image_data, const int width, const int height, const int components);
+	/**
+	 * @brief Sets the texture coordinates for a single row spritesheet.
+	 *
+	 * @param vertices The vertices of the object to set the texture coordinates for.
+	 * @param col The column of the spritesheet to set.
+	 * @param total_cols The total number of columns in the spritesheet.
+	 */
 	static void set_single_row_spritesheet_coords(GLfloat* vertices, int col, int total_cols);
 };

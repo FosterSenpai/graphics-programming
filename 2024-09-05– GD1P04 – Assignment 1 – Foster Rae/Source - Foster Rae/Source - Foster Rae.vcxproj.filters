@@ -32,6 +32,15 @@
     <ClInclude Include="c_transformations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="c_shape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="c_triangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="c_quad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="image_loader.cpp">
@@ -52,11 +61,17 @@
     <ClCompile Include="c_shader_loader.cpp">
       <Filter>Source Files\Class Implementations</Filter>
     </ClCompile>
+    <ClCompile Include="c_quad.cpp">
+      <Filter>Source Files\Class Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="c_triangle.cpp">
+      <Filter>Source Files\Class Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="c_shape.cpp">
+      <Filter>Source Files\Class Implementations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="Exercise_2.frag">
       <Filter>Shader Files</Filter>
     </None>

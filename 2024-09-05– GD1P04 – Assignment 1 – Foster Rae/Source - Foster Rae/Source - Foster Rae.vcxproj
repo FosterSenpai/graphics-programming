@@ -139,22 +139,27 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="c_graphics_utils.h" />
+    <ClInclude Include="c_quad.h" />
     <ClInclude Include="c_shader_loader.h" />
+    <ClInclude Include="c_shape.h" />
     <ClInclude Include="c_texture_loader.h" />
     <ClInclude Include="c_transformations.h" />
+    <ClInclude Include="c_triangle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="c_graphics_utils.cpp" />
+    <ClCompile Include="c_quad.cpp" />
     <ClCompile Include="c_shader_loader.cpp" />
+    <ClCompile Include="c_shape.cpp" />
     <ClCompile Include="c_texture_loader.cpp" />
     <ClCompile Include="c_transformations.cpp" />
+    <ClCompile Include="c_triangle.cpp" />
     <ClCompile Include="image_loader.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Exercise_2.frag" />
     <None Include="Exercise_2.vert" />
-    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -42,16 +42,4 @@ public:
 	 * @return A pointer to the created window.
 	 */
 	static GLFWwindow* create_window(int width, int height, const char* title);
-	/**
-	 * @brief Initializes the quad.
-	 *
-	 * @param quad_vao Global variable for the vertex array object of the quad.
-	 * @param quad_vbo Global variable for the vertex buffer object of the quad.
-	 * @param quad_ebo Global variable for the element buffer object of the quad.
-	 * @param texture_id1 Global variable for the first texture ID.
-	 * @param texture_id2 Global variable for the second texture ID.
-	 *  @param texture_id3 Global variable for the third texture ID. ( Sprite Sheet )
-	 * @return The Program ID. (GLuint)
-	 */
-	static GLuint initialize_quads(GLuint &quad_vao, GLuint &quad_vbo, GLuint &quad_ebo, GLuint &texture_id1, GLuint &texture_id2, GLuint& texture_id3);
 };
