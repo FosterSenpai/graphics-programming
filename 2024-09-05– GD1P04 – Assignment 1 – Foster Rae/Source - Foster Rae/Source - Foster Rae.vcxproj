@@ -152,11 +152,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Exercise.frag" />
-    <None Include="Exercise.vert" />
+    <None Include="Exercise_2.frag" />
+    <None Include="Exercise_2.vert" />
     <None Include="README.md" />
-    <None Include="Resources\Shaders\Texture.frag" />
-    <None Include="Resources\Shaders\Texture.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

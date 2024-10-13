@@ -54,19 +54,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\Texture.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Resources\Shaders\Texture.frag">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="README.md">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="Exercise.frag">
+    <None Include="Exercise_2.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="Exercise.vert">
+    <None Include="Exercise_2.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

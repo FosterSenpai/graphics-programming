@@ -43,4 +43,5 @@ public:
 	 * @return The texture ID.
 	 */
 	static GLuint create_texture(const unsigned char* image_data, const int width, const int height, const int components);
+	static void set_single_row_spritesheet_coords(GLfloat* vertices, int col, int total_cols);
 };

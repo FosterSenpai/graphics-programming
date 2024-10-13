@@ -36,3 +36,17 @@ GLuint c_texture_loader::create_texture(const unsigned char* image_data, const i
 
     return texture; // Pass the generated texture back to the caller.
 }
+
+void c_texture_loader::set_single_row_spritesheet_coords(GLfloat* vertices, int col, int total_cols)
+{
+    float sprite_width = 1.0f / total_cols;
+
+    float u_min = col * sprite_width;
+    float u_max = u_min + sprite_width;
+
+	// Update texture coordinates for the second quad
+    vertices[32 + 6] = u_min; vertices[32 + 7] = 1.0f; // Top-left
+    vertices[40 + 6] = u_max; vertices[40 + 7] = 1.0f; // Top-right
+    vertices[48 + 6] = u_max; vertices[48 + 7] = 0.0f; // Bottom-right
+    vertices[56 + 6] = u_min; vertices[56 + 7] = 0.0f; // Bottom-left
+}

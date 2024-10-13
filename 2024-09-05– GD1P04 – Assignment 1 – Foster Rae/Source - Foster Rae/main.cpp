@@ -22,7 +22,7 @@ GLFWwindow* window;
 GLfloat current_time;
 
 // == Objects ==
-GLuint quad_program, quad_vao, quad_vbo, quad_ebo, texture_id1, texture_id2;
+GLuint quad_program, quad_vao, quad_vbo, quad_ebo, texture_id1, texture_id2, texture_id3;
 
 // == Transformations ==
 // Quad 1, Scale by 0.5 and translate to the left.
@@ -78,8 +78,24 @@ void initial_setup()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Set to general blend.
 	// Flip the images vertically.
 	stbi_set_flip_vertically_on_load(true);
+
 	// Initialize the quads.
-	quad_program = c_graphics_utils::initialize_quads(quad_vao, quad_vbo, quad_ebo, texture_id1, texture_id2);
+	quad_program = c_graphics_utils::initialize_quads(quad_vao, quad_vbo, quad_ebo, texture_id1, texture_id2, texture_id3);
+
+	// Set texture parameters for texture_id1
+    glBindTexture(GL_TEXTURE_2D, texture_id1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // Set texture parameters for texture_id2
+    glBindTexture(GL_TEXTURE_2D, texture_id2);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // Set texture parameters for texture_id3
+    glBindTexture(GL_TEXTURE_2D, texture_id3);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// Prepare the window.
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -107,36 +123,44 @@ void render()
 	glBindVertexArray(quad_vao); // Bind the VAO.
 
 	// Quad Program Uniforms.
-// == Textures ==
-	// Texture 1.
-	glActiveTexture(GL_TEXTURE0); // Activate texture unit 0.
-	glBindTexture(GL_TEXTURE_2D, texture_id1); // Bind the texture to the texture unit.
-	glUniform1i(glGetUniformLocation(quad_program, "texture_0"), 0); // Get and set the texture uniform with the texture unit.
-	// Set the texture wrapping parameters for texture_id1.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    current_time = static_cast<float>(glfwGetTime());
+    glUniform1f(glGetUniformLocation(quad_program, "time"), current_time);
+    GLint model_matrix_location = glGetUniformLocation(quad_program, "model_matrix");
 
-	// Texture 2.
+	// == Draw Quad 1 ==
+    // Bind Texture 0 for Quad 1
+    glActiveTexture(GL_TEXTURE0); // Activate texture unit 0.
+    glBindTexture(GL_TEXTURE_2D, texture_id1); // Bind the texture to the texture unit.
+    glUniform1i(glGetUniformLocation(quad_program, "texture_0"), 0); // Set the texture uniform to texture slot 0.
+
+	// Bind Texture 1 (second frame for mix).
 	glActiveTexture(GL_TEXTURE1); // Activate texture unit 1.
 	glBindTexture(GL_TEXTURE_2D, texture_id2); // Bind the texture to the texture unit.
-	glUniform1i(glGetUniformLocation(quad_program, "texture_1"), 1); // Get and set the texture uniform with the texture unit.
-	// Set the texture wrapping parameters for texture_id2.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Repeat the texture.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glUniform1i(glGetUniformLocation(quad_program, "texture_1"), 1); // Get and set the texture uniform to texture slot 1.
 
-	    // Set the time uniform
-    current_time = static_cast<float>(glfwGetTime());
-	std::cout << "Current time: " << current_time << std::endl;
-    glUniform1f(glGetUniformLocation(quad_program, "time"), current_time);
-
-	// == Quads ==
-    GLint model_matrix_location = glGetUniformLocation(quad_program, "model_matrix");
-    // Set model matrix and draw Quad 1 (Centered Sprite).
+    // Set model matrix for Quad 1
     glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(quad1_transformations.get_model_matrix()));
+
+	// Set use_spritesheet uniform to 0 for Quad 1.
+	glUniform1i(glGetUniformLocation(quad_program, "use_spritesheet"), 0);
+
+    // Draw Quad 1
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-    // Set model matrix and draw Quad 2 (Repeated Texture).
+
+	// == Draw Quad 2 ==
+    // Bind Texture 2 for Quad 2 (sprite sheet)
+	glActiveTexture(GL_TEXTURE2); // Activate texture unit 2.
+	glBindTexture(GL_TEXTURE_2D, texture_id3); // Bind the texture to the texture unit.
+	glUniform1i(glGetUniformLocation(quad_program, "texture_2"), 2); // Get and set the texture uniform to texture slot 2.
+
+    // Set model matrix for Quad 2
     glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(quad2_transformations.get_model_matrix()));
+
+	// Set use_spritesheet uniform to 1 for Quad 2.
+	glUniform1i(glGetUniformLocation(quad_program, "use_spritesheet"), 1);
+
+    // Draw Quad 2
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, reinterpret_cast<void*>(6 * sizeof(GLuint))); // Offset by 6 indices.
 
 

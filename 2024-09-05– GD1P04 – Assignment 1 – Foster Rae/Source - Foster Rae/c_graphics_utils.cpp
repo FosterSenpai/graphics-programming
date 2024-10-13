@@ -42,11 +42,8 @@ GLFWwindow* c_graphics_utils::create_window(int width, int height, const char* t
 	glfwMakeContextCurrent(window);
 	return window; // Return the window if it was successfully created.
 }
-GLuint c_graphics_utils::initialize_quads(GLuint& quad_vao, GLuint& quad_vbo, GLuint& quad_ebo, GLuint& texture_id1, GLuint& texture_id2)
+GLuint c_graphics_utils::initialize_quads(GLuint& quad_vao, GLuint& quad_vbo, GLuint& quad_ebo, GLuint& texture_id1, GLuint& texture_id2, GLuint& texture_id3)
 {
-			// Create the program object.
-	GLuint program = c_shader_loader::create_program("Resources/Shaders/Exercise.vert",
-                                                     "Resources/Shaders/Exercise.frag");
 
 	// Vertex data for two quads
 	GLfloat vertices_quad[] = {
@@ -58,11 +55,14 @@ GLuint c_graphics_utils::initialize_quads(GLuint& quad_vao, GLuint& quad_vbo, GL
 	    -0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 0.0f, // Bottom-left
 
 	    // Quad 2 (Repeated Texture)
-	    -0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 2.0f, // Top-left
-	     0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  2.0f, 2.0f, // Top-right
-	     0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  2.0f, 0.0f, // Bottom-right
+	    -0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f, // Top-left
+	     0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // Top-right
+	     0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f, // Bottom-right
 	    -0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 0.0f  // Bottom-left
 	};
+
+	// Set second quad image to first sprite in sprite sheet.
+	c_texture_loader::set_single_row_spritesheet_coords(vertices_quad, 0, 8);
 
 	GLuint indices_quad[] = {
 	    0, 1, 2, 2, 3, 0, // Quad 1
@@ -109,6 +109,21 @@ GLuint c_graphics_utils::initialize_quads(GLuint& quad_vao, GLuint& quad_vbo, GL
     // Free the image data.
     stbi_image_free(image_2_data);
 
+	// == Texture 3 (Sprite Sheet) ==
+	// Save the image data.
+	int image_3_width, image_3_height, image_3_components;
+	unsigned char* image_3_data = stbi_load("Resources/Textures/AdventureGirl_Attack.png", &image_3_width, &image_3_height, &image_3_components, 0);
+	// Generate the texture.
+	texture_id3 = c_texture_loader::create_texture(image_3_data, image_3_width, image_3_height, image_3_components);
+	// Free the image data.
+	stbi_image_free(image_3_data);
+
+	// Unbind the VAO.
+	glBindVertexArray(0);
+
+	// Create the program object.
+	GLuint program = c_shader_loader::create_program("Exercise_2.vert",
+													 "Exercise_2.frag");
 
 	return program;
 }
