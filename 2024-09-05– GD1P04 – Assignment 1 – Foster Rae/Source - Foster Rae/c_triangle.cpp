@@ -41,10 +41,14 @@ void c_triangle::draw(GLuint shader_program)
 {
     // Bind the VAO.
     glBindVertexArray(vao_);
-	// Send the model matrix to the shader.
+
+    // Send the model matrix to the shader.
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "model_matrix"), 1, GL_FALSE, glm::value_ptr(model_matrix));
 
-	// Bind all textures in the textures vector to their respective texture units.
+    // Send the is_animated flag to the shader.
+    glUniform1i(glGetUniformLocation(shader_program, "is_animated"), is_animated);
+
+    // Bind all textures in the textures vector to their respective texture units.
     for (size_t i = 0; i < textures_.size(); ++i) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, textures_[i]);
@@ -58,15 +62,11 @@ void c_triangle::draw(GLuint shader_program)
     }
 
     // Set the uniform for the number of textures in the vector.
-    GLuint num_textures_loc = glGetUniformLocation(shader_program, "num_textures");
+    GLuint num_textures_loc = glGetUniformLocation(shader_program, "texture_count");
     glUniform1i(num_textures_loc, textures_.size());
 
-    // Bind each texture and draw the triangle.
-    // Will draw each texture on top of each other starting from the first texture added.
-    for (const auto& texture : textures_) {
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, nullptr);
-    }
+    // Draw the triangle.
+    glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, nullptr);
 
     // Unbind the VAO.
     glBindVertexArray(0);

@@ -22,9 +22,10 @@ public:
 	 * @param pos The position of the triangle. (glm::vec3)
 	 * @param rot_angle The rotation angle of the triangle. (float)
 	 * @param scl_factor The scale factor of the triangle. (glm::vec3)
+	 * @param animated Whether the triangle is animated or not. (bool)
 	 */
-    c_triangle(const glm::vec3& pos, float rot_angle, const glm::vec3& scl_factor)
-        : c_shape(pos, rot_angle, scl_factor) {}
+    c_triangle(const glm::vec3& pos, float rot_angle, const glm::vec3& scl_factor, bool animated)
+        : c_shape(pos, rot_angle, scl_factor, animated) {}
 
 	void init() override;
 	void draw(GLuint shader_program) override;

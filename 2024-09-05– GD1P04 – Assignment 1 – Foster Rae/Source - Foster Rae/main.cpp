@@ -23,9 +23,9 @@ GLfloat current_time;
 GLuint shader_program;
 
 // ==== CREATE SHAPES HERE ====
-c_quad quad1(glm::vec3(-0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f));
-c_quad quad2(glm::vec3(0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f));
-c_triangle triangle(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f));
+c_quad quad1(glm::vec3(-0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f), true);
+c_quad quad2(glm::vec3(0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f), false);
+c_triangle triangle(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f),false);
 
 // == Function Prototypes ==
 /**
@@ -85,9 +85,17 @@ void initial_setup()
 	triangle.init();
 
 	// ==== ADD TEXTURES HERE ====
-	quad1.add_texture("Resources/Textures/Run (1).PNG");
-	quad2.add_texture("Resources/Textures/Run (2).PNG");
-	triangle.add_texture("Resources/Textures/Run (3).PNG");
+	quad1.add_texture("Resources/Textures/Jump_Attack__001.PNG");
+	quad1.add_texture("Resources/Textures/Jump_Attack__002.PNG");
+	quad1.add_texture("Resources/Textures/Jump_Attack__003.PNG");
+	quad1.add_texture("Resources/Textures/Jump_Attack__004.PNG");
+	quad1.add_texture("Resources/Textures/Jump_Attack__005.PNG");
+	quad1.add_texture("Resources/Textures/Jump_Attack__006.PNG");
+	quad1.add_texture("Resources/Textures/Jump_Attack__007.PNG");
+	quad1.add_texture("Resources/Textures/Jump_Attack__008.PNG");
+
+	quad2.add_texture("Resources/Textures/Run (1).PNG");
+	triangle.add_texture("Resources/Textures/Jump_Attack__007.PNG");
 
 	// Prepare the window.
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -95,6 +103,8 @@ void initial_setup()
 }
 void update()
 {
+	// Get the current time.
+	current_time = glfwGetTime();
 	// ==== APPLY TRANSFORMS HERE ====
 	quad1.update_model_matrix();
 	quad2.update_model_matrix();
@@ -109,8 +119,11 @@ void render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Use the shader program.
 	glUseProgram(shader_program);
+	// Send the current time to the shader.
+    glUniform1f(glGetUniformLocation(shader_program, "time"), current_time);
 	// == START OF RENDERING PIPELINE ==
 
+	// ==== SEND UNIFORMS HERE ====
 	// ==== DRAW CALLS HERE ====
 	quad1.draw(shader_program);
     quad2.draw(shader_program);

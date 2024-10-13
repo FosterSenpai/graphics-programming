@@ -46,6 +46,7 @@ public:
 	 */
 	void update_model_matrix();
 
+	bool is_animated = false;
 protected:
 	/**
 	 * @brief Constructs a Shape and sets the transforms.
@@ -54,9 +55,10 @@ protected:
 	 * @param position The position of the shape. (glm::vec3)
 	 * @param rotation The rotation of the shape. (float)
 	 * @param scale The scale of the shape. (glm::vec3)
+	 *  @param is_animated Whether the shape is animated or not. (bool)
 	 */
-    c_shape(const glm::vec3& position, float rotation, const glm::vec3& scale)
-        : position(position), rotation(rotation), scale(scale), model_matrix(1.0f) {}
+    c_shape(const glm::vec3& position, float rotation, const glm::vec3& scale, bool is_animated)
+        : position(position), rotation(rotation), scale(scale), model_matrix(1.0f), is_animated(is_animated) {}
 
 	GLuint vao_ = 0, vbo_ = 0, ebo_ = 0;
 	std::vector<GLfloat> vertices_; //Vector for vertex data.
