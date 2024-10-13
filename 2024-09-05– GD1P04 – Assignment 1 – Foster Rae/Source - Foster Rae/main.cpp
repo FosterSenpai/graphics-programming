@@ -23,9 +23,10 @@ GLfloat current_time;
 GLuint shader_program;
 
 // ==== CREATE SHAPES HERE ====
-c_quad quad1(glm::vec3(-0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f), true);
-c_quad quad2(glm::vec3(0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f), false);
-c_triangle triangle(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f),false);
+c_quad background_quad(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(2.0f), false);
+c_quad quad1(glm::vec3(-0.55f, -0.18f, 0.0f), 0.0f, glm::vec3(1.0f), false);
+c_quad quad2(glm::vec3(0.55f, -0.18f, 0.0f), 0.0f, glm::vec3(1.0f), false);
+c_quad coin(glm::vec3(0.8f, 0.8f, 0.0f), 0.0f, glm::vec3(0.2f), true);
 
 // == Function Prototypes ==
 /**
@@ -80,22 +81,31 @@ void initial_setup()
 	shader_program = c_shader_loader::create_program("vertex_shader.vert", "fragment_shader.frag");
 
 	// ==== INIT OBJECTS HERE ====
+	background_quad.init();
 	quad1.init();
 	quad2.init();
-	triangle.init();
+	coin.init();
 
 	// ==== ADD TEXTURES HERE ====
-	quad1.add_texture("Resources/Textures/Jump_Attack__001.PNG");
-	quad1.add_texture("Resources/Textures/Jump_Attack__002.PNG");
-	quad1.add_texture("Resources/Textures/Jump_Attack__003.PNG");
-	quad1.add_texture("Resources/Textures/Jump_Attack__004.PNG");
-	quad1.add_texture("Resources/Textures/Jump_Attack__005.PNG");
-	quad1.add_texture("Resources/Textures/Jump_Attack__006.PNG");
-	quad1.add_texture("Resources/Textures/Jump_Attack__007.PNG");
-	quad1.add_texture("Resources/Textures/Jump_Attack__008.PNG");
+	background_quad.add_texture("Resources/Textures/s2U4Qp6.PNG");
+	quad1.add_texture("Resources/Textures/left_hand.PNG");
+	quad2.add_texture("Resources/Textures/right_hand.PNG");
+	coin.add_texture("Resources/Textures/coin/tile000.PNG");
+	coin.add_texture("Resources/Textures/coin/tile001.PNG");
+	coin.add_texture("Resources/Textures/coin/tile002.PNG");
+	coin.add_texture("Resources/Textures/coin/tile003.PNG");
+	coin.add_texture("Resources/Textures/coin/tile004.PNG");
+	coin.add_texture("Resources/Textures/coin/tile005.PNG");
+	coin.add_texture("Resources/Textures/coin/tile006.PNG");
+	coin.add_texture("Resources/Textures/coin/tile007.PNG");
+	coin.add_texture("Resources/Textures/coin/tile008.PNG");
+	coin.add_texture("Resources/Textures/coin/tile009.PNG");
+	coin.add_texture("Resources/Textures/coin/tile010.PNG");
+	coin.add_texture("Resources/Textures/coin/tile011.PNG");
+	coin.add_texture("Resources/Textures/coin/tile012.PNG");
+	coin.add_texture("Resources/Textures/coin/tile013.PNG");
+	coin.add_texture("Resources/Textures/coin/tile014.PNG");
 
-	quad2.add_texture("Resources/Textures/Run (1).PNG");
-	triangle.add_texture("Resources/Textures/Jump_Attack__007.PNG");
 
 	// Prepare the window.
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -105,10 +115,12 @@ void update()
 {
 	// Get the current time.
 	current_time = glfwGetTime();
+
 	// ==== APPLY TRANSFORMS HERE ====
+	background_quad.update_model_matrix();
 	quad1.update_model_matrix();
 	quad2.update_model_matrix();
-	triangle.update_model_matrix();
+	coin.update_model_matrix();
 
 	// Poll for and process events.
 	glfwPollEvents();
@@ -125,9 +137,10 @@ void render()
 
 	// ==== SEND UNIFORMS HERE ====
 	// ==== DRAW CALLS HERE ====
+	background_quad.draw(shader_program);
 	quad1.draw(shader_program);
     quad2.draw(shader_program);
-    triangle.draw(shader_program);
+	coin.draw(shader_program);
 
 	// == END OF RENDERING PIPELINE ==
 	glBindVertexArray(0); // Unbind the VAO.

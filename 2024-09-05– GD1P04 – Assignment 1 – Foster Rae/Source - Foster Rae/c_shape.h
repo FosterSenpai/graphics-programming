@@ -36,11 +36,13 @@ public:
 	virtual void add_texture(const char* texture_path);
 	virtual ~c_shape();
 
-	// Transformation variables.
-	glm::vec3 position;
-    float rotation;
-    glm::vec3 scale;
-    glm::mat4 model_matrix;
+	// == Transformation Methods ==
+	void set_position(glm::vec3 pos) { position = pos; }
+	void set_rotation(float rot) { rotation = rot; }
+	void set_scale(glm::vec3 scl) { scale = scl; }
+	glm::vec3 get_position() const { return position; }
+	float get_rotation() const { return rotation; }
+	glm::vec3 get_scale() const { return scale; }
 	/**
 	 * @brief Update the model matrix of the shape.
 	 */
@@ -59,6 +61,12 @@ protected:
 	 */
     c_shape(const glm::vec3& position, float rotation, const glm::vec3& scale, bool is_animated)
         : position(position), rotation(rotation), scale(scale), model_matrix(1.0f), is_animated(is_animated) {}
+
+	// Transformation variables.
+	glm::vec3 position;
+    float rotation;
+    glm::vec3 scale;
+    glm::mat4 model_matrix;
 
 	GLuint vao_ = 0, vbo_ = 0, ebo_ = 0;
 	std::vector<GLfloat> vertices_; //Vector for vertex data.
