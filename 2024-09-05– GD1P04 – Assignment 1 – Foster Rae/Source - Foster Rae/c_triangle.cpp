@@ -44,6 +44,23 @@ void c_triangle::draw(GLuint shader_program)
 	// Send the model matrix to the shader.
     glUniformMatrix4fv(glGetUniformLocation(shader_program, "model_matrix"), 1, GL_FALSE, glm::value_ptr(model_matrix));
 
+	// Bind all textures in the textures vector to their respective texture units.
+    for (size_t i = 0; i < textures_.size(); ++i) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, textures_[i]);
+    }
+
+    // Send each texture to the shader through uniforms.
+    for (size_t i = 0; i < textures_.size(); ++i) {
+        std::string uniform_name = "textures[" + std::to_string(i) + "]";
+        GLuint texture_loc = glGetUniformLocation(shader_program, uniform_name.c_str());
+        glUniform1i(texture_loc, i);
+    }
+
+    // Set the uniform for the number of textures in the vector.
+    GLuint num_textures_loc = glGetUniformLocation(shader_program, "num_textures");
+    glUniform1i(num_textures_loc, textures_.size());
+
     // Bind each texture and draw the triangle.
     // Will draw each texture on top of each other starting from the first texture added.
     for (const auto& texture : textures_) {

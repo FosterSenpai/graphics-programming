@@ -14,6 +14,7 @@
 #include <glew.h>
 #include <vector>
 #include "gtc/type_ptr.hpp"
+#include <string>
 
 class c_shape
 {

@@ -22,8 +22,10 @@ GLFWwindow* window;
 GLfloat current_time;
 GLuint shader_program;
 
-// ==== TODO: CREATE SHAPES HERE ====
-
+// ==== CREATE SHAPES HERE ====
+c_quad quad1(glm::vec3(-0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f));
+c_quad quad2(glm::vec3(0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f));
+c_triangle triangle(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f));
 
 // == Function Prototypes ==
 /**
@@ -77,9 +79,15 @@ void initial_setup()
 	// Create the shader program.
 	shader_program = c_shader_loader::create_program("vertex_shader.vert", "fragment_shader.frag");
 
-	// ==== TODO: INIT OBJECTS HERE ====
+	// ==== INIT OBJECTS HERE ====
+	quad1.init();
+	quad2.init();
+	triangle.init();
 
-	// ==== TODO: ADD TEXTURES HERE ====
+	// ==== ADD TEXTURES HERE ====
+	quad1.add_texture("Resources/Textures/Run (1).PNG");
+	quad2.add_texture("Resources/Textures/Run (2).PNG");
+	triangle.add_texture("Resources/Textures/Run (3).PNG");
 
 	// Prepare the window.
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -87,7 +95,10 @@ void initial_setup()
 }
 void update()
 {
-	// ==== TODO:  APPLY TRANSFORMS HERE ====
+	// ==== APPLY TRANSFORMS HERE ====
+	quad1.update_model_matrix();
+	quad2.update_model_matrix();
+	triangle.update_model_matrix();
 
 	// Poll for and process events.
 	glfwPollEvents();
@@ -100,7 +111,10 @@ void render()
 	glUseProgram(shader_program);
 	// == START OF RENDERING PIPELINE ==
 
-	// ==== TODO: DRAW CALLS HERE ====
+	// ==== DRAW CALLS HERE ====
+	quad1.draw(shader_program);
+    quad2.draw(shader_program);
+    triangle.draw(shader_program);
 
 	// == END OF RENDERING PIPELINE ==
 	glBindVertexArray(0); // Unbind the VAO.
