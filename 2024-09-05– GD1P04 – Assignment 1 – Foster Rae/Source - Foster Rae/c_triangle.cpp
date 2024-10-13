@@ -37,10 +37,14 @@ void c_triangle::init()
 	glBindVertexArray(0); // Unbind ready for next VAO.
 }
 
-void c_triangle::draw()
+void c_triangle::draw(GLuint shader_program)
 {
+	// Update the transformations.
+    transformations_.update();
     // Bind the VAO.
     glBindVertexArray(vao_);
+	// Send the model matrix to the shader.
+    glUniformMatrix4fv(glGetUniformLocation(shader_program, "model_matrix"), 1, GL_FALSE, glm::value_ptr(transformations_.get_model_matrix()));
 
     // Bind each texture and draw the triangle.
     // Will draw each texture on top of each other starting from the first texture added.
