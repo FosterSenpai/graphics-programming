@@ -10,25 +10,20 @@ Author : Foster Rae
 Mail : Foster.Rae@mds.ac.nz
 ************************************************************************/
 #include <stb_image.h>
-
 #include "c_graphics_utils.h"
-#include "c_transformations.h"
 #include <gtc/type_ptr.hpp>
+#include "c_quad.h"
+#include "c_triangle.h"
 
 // == Global Variables ==
 int window_width = 800;
 int window_height = 800;
 GLFWwindow* window;
 GLfloat current_time;
+GLuint shader_program;
 
-// == Objects ==
-GLuint quad_program, quad_vao, quad_vbo, quad_ebo, texture_id1, texture_id2, texture_id3;
+// ==== TODO: CREATE SHAPES HERE ====
 
-// == Transformations ==
-// Quad 1, Scale by 0.5 and translate to the left.
-c_transformations quad1_transformations(glm::vec3(-0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f));
-// Quad 2, Scale by 0.5 and translate to the right.
-c_transformations quad2_transformations(glm::vec3(0.5f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f));
 
 // == Function Prototypes ==
 /**
@@ -79,7 +74,12 @@ void initial_setup()
 	// Flip the images vertically.
 	stbi_set_flip_vertically_on_load(true);
 
-	// Todo: stuff here
+	// Create the shader program.
+	shader_program = c_shader_loader::create_program("vertex_shader.vert", "fragment_shader.frag");
+
+	// ==== TODO: INIT OBJECTS HERE ====
+
+	// ==== TODO: ADD TEXTURES HERE ====
 
 	// Prepare the window.
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -87,7 +87,7 @@ void initial_setup()
 }
 void update()
 {
-	// Todo: Apply object transformations.
+	// ==== TODO:  APPLY TRANSFORMS HERE ====
 
 	// Poll for and process events.
 	glfwPollEvents();
@@ -96,8 +96,11 @@ void render()
 {
 	// Clear the colour buffer and depth buffer.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	// Use the shader program.
+	glUseProgram(shader_program);
 	// == START OF RENDERING PIPELINE ==
+
+	// ==== TODO: DRAW CALLS HERE ====
 
 	// == END OF RENDERING PIPELINE ==
 	glBindVertexArray(0); // Unbind the VAO.

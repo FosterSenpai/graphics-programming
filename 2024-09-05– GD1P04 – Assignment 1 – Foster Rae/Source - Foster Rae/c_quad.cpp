@@ -39,12 +39,10 @@ void c_quad::init()
 }
 void c_quad::draw(GLuint shader_program)
 {
-	// Update the transformations.
-	transformations_.update();
 	// Bind the VAO.
 	glBindVertexArray(vao_);
 	// Send the model matrix to the shader.
-	glUniformMatrix4fv(glGetUniformLocation(shader_program, "model_matrix"), 1, GL_FALSE, glm::value_ptr(transformations_.get_model_matrix()));
+	glUniformMatrix4fv(glGetUniformLocation(shader_program, "model_matrix"), 1, GL_FALSE, glm::value_ptr(model_matrix));
 
 	// Bind each texture and draw the quad.
 	// Will draw each texture on top of each other starting from the first texture added.

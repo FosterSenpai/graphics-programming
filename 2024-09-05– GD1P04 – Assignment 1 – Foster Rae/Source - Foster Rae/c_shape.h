@@ -13,34 +13,52 @@
 #pragma once
 #include <glew.h>
 #include <vector>
-#include "c_transformations.h"
 #include "gtc/type_ptr.hpp"
 
 class c_shape
 {
 public:
+	// == Public Methods ==
+	/**
+	 * @brief Initializes the shapes necessary data.
+	 */
 	virtual void init() = 0;
 	/**
 	 * @brief Draws the shape.
 	 * @param shader_program A reference to the shader program.
 	 */
 	virtual void draw(GLuint shader_program) = 0;
+	/**
+	 * @brief Adds a texture to the shapes texture vector.
+	 * @param texture_path The path to the texture.
+	 */
 	virtual void add_texture(const char* texture_path);
-	virtual ~c_shape() = default;
+	virtual ~c_shape();
+
+	// Transformation variables.
+	glm::vec3 position;
+    float rotation;
+    glm::vec3 scale;
+    glm::mat4 model_matrix;
+	/**
+	 * @brief Update the model matrix of the shape.
+	 */
+	void update_model_matrix();
+
 protected:
 	/**
 	 * @brief Constructs a Shape and sets the transforms.
+	 * @note The model matrix is initialized to an identity matrix.
 	 *
-	 * @param position The position of the quad. (glm::vec3)
-	 * @param rotation_angle The rotation angle of the quad. (float)
-	 * @param scale_factor The scale factor of the quad. (glm::vec3)
+	 * @param position The position of the shape. (glm::vec3)
+	 * @param rotation The rotation of the shape. (float)
+	 * @param scale The scale of the shape. (glm::vec3)
 	 */
-    c_shape(const glm::vec3& position, float rotation_angle, const glm::vec3& scale_factor)
-    : transformations_(position, rotation_angle, scale_factor) {}
+    c_shape(const glm::vec3& position, float rotation, const glm::vec3& scale)
+        : position(position), rotation(rotation), scale(scale), model_matrix(1.0f) {}
 
 	GLuint vao_ = 0, vbo_ = 0, ebo_ = 0;
 	std::vector<GLfloat> vertices_; //Vector for vertex data.
 	std::vector<GLuint> indices_;   //Vector for indices.
 	std::vector<GLuint> textures_;  //Vector for textures.
-	c_transformations transformations_; // Object holding all transforms of the shape.
 };

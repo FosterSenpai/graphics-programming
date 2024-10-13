@@ -18,28 +18,37 @@
     <Filter Include="Source Files\Class Implementations">
       <UniqueIdentifier>{a7646077-2bfb-4279-bca9-ee04f682ec75}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Class Implementations\Shapes">
+      <UniqueIdentifier>{ff5a5d3f-534e-4a54-8c47-ba46652e1ace}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Class Implementations\Tools">
+      <UniqueIdentifier>{a0841143-63e0-42e5-b95e-aa6a63177ab2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{e9f74439-8c9a-48f2-9a43-da59aded8c25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Shapes">
+      <UniqueIdentifier>{161b72d5-52c4-4590-9e58-9baed145be05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="c_shader_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="c_graphics_utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="c_texture_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="c_transformations.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="c_quad.h">
+      <Filter>Header Files\Shapes</Filter>
     </ClInclude>
     <ClInclude Include="c_shape.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Shapes</Filter>
     </ClInclude>
     <ClInclude Include="c_triangle.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Shapes</Filter>
     </ClInclude>
-    <ClInclude Include="c_quad.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="c_graphics_utils.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="c_shader_loader.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="c_texture_loader.h">
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -49,34 +58,32 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="c_transformations.cpp">
-      <Filter>Source Files\Class Implementations</Filter>
-    </ClCompile>
-    <ClCompile Include="c_graphics_utils.cpp">
-      <Filter>Source Files\Class Implementations</Filter>
-    </ClCompile>
-    <ClCompile Include="c_texture_loader.cpp">
-      <Filter>Source Files\Class Implementations</Filter>
-    </ClCompile>
-    <ClCompile Include="c_shader_loader.cpp">
-      <Filter>Source Files\Class Implementations</Filter>
-    </ClCompile>
     <ClCompile Include="c_quad.cpp">
-      <Filter>Source Files\Class Implementations</Filter>
-    </ClCompile>
-    <ClCompile Include="c_triangle.cpp">
-      <Filter>Source Files\Class Implementations</Filter>
+      <Filter>Source Files\Class Implementations\Shapes</Filter>
     </ClCompile>
     <ClCompile Include="c_shape.cpp">
-      <Filter>Source Files\Class Implementations</Filter>
+      <Filter>Source Files\Class Implementations\Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="c_triangle.cpp">
+      <Filter>Source Files\Class Implementations\Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="c_texture_loader.cpp">
+      <Filter>Source Files\Class Implementations\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="c_graphics_utils.cpp">
+      <Filter>Source Files\Class Implementations\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="c_shader_loader.cpp">
+      <Filter>Source Files\Class Implementations\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Exercise_2.frag">
+    <None Include="vertex_shader.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="Exercise_2.vert">
+    <None Include="fragment_shader.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
 </Project>
