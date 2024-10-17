@@ -46,33 +46,42 @@ void c_camera::update(float delta_time)
 
 void c_camera::process_input(GLFWwindow* window, float delta_time)
 {
-	// Camera Movement Controls/
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // Move forward.
+	if (!is_target_camera_) // Free Camera Movement Controls
 	{
-		position_ += get_camera_speed() * delta_time * look_dir_;
+		// Camera Movement Controls/
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // Move forward.
+		{
+			position_ += get_camera_speed() * delta_time * look_dir_;
+		}
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // Move backward.
+		{
+			position_ -= get_camera_speed() * delta_time * look_dir_;
+		}
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // Move left.
+		{
+			position_ -= glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
+		}
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // Move right.
+		{
+			position_ += glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
+		}
+		// If space is pressed, move up.
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		{
+			position_ += up_dir_ * get_camera_speed() * delta_time;
+		}
+		// If left control is pressed, move down.
+		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		{
+			position_ -= up_dir_ * get_camera_speed() * delta_time;
+		}
 	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // Move backward.
+	else
 	{
-		position_ -= get_camera_speed() * delta_time * look_dir_;
+		// Sway left to right based on delta time sine wave function while in target mode.
+		position_.x = target_position_.x + get_camera_speed() * sin(current_time);
 	}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // Move left.
-	{
-		position_ -= glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
-	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // Move right.
-	{
-		position_ += glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
-	}
-	// If space is pressed, move up.
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		position_ += up_dir_ * get_camera_speed() * delta_time;
-	}
-	// If left control is pressed, move down.
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-	{
-		position_ -= up_dir_ * get_camera_speed() * delta_time;
-	}
+
 	// If left shift is pressed, speed up the camera.
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{

@@ -3,6 +3,19 @@
 #include<fstream>
 #include<vector>
 
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+#include "c_camera.h"
+
 // == Constructors / Destructors ==
 c_shader_loader::c_shader_loader(void) = default;
 c_shader_loader::~c_shader_loader(void) = default;
@@ -50,7 +63,7 @@ void c_shader_loader::set_float(GLuint program, const std::string& name, float v
 {
 	glUniform1f(glGetUniformLocation(program, name.c_str()), value);
 }
-void c_shader_loader::setVec2(GLuint program, const std::string& name, const glm::vec2& value)
+void c_shader_loader::set_vec2(GLuint program, const std::string& name, const glm::vec2& value)
 {
 	glUniform2fv(glGetUniformLocation(program, name.c_str()), 1, &value[0]);
 }
@@ -58,7 +71,7 @@ void c_shader_loader::set_vec2(GLuint program, const std::string& name, float x,
 {
 	glUniform2f(glGetUniformLocation(program, name.c_str()), x, y); 
 }
-void c_shader_loader::setVec3(GLuint program, const std::string& name, const glm::vec3& value)
+void c_shader_loader::set_vec3(GLuint program, const std::string& name, const glm::vec3& value)
 {
 	glUniform3fv(glGetUniformLocation(program, name.c_str()), 1, &value[0]);
 }
@@ -66,7 +79,7 @@ void c_shader_loader::set_vec3(GLuint program, const std::string& name, float x,
 {
 	glUniform3f(glGetUniformLocation(program, name.c_str()), x, y, z);
 }
-void c_shader_loader::setVec4(GLuint program, const std::string& name, const glm::vec4& value)
+void c_shader_loader::set_vec4(GLuint program, const std::string& name, const glm::vec4& value)
 {
 	glUniform4fv(glGetUniformLocation(program, name.c_str()), 1, &value[0]);
 }
@@ -74,15 +87,15 @@ void c_shader_loader::set_vec4(GLuint program, const std::string& name, float x,
 {
 	glUniform4f(glGetUniformLocation(program, name.c_str()), x, y, z, w);
 }
-void c_shader_loader::setMat2(GLuint program, const std::string& name, const glm::mat2& mat)
+void c_shader_loader::set_mat2(GLuint program, const std::string& name, const glm::mat2& mat)
 {
 	glUniformMatrix2fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
-void c_shader_loader::setMat3(GLuint program, const std::string& name, const glm::mat3& mat)
+void c_shader_loader::set_mat_3(GLuint program, const std::string& name, const glm::mat3& mat)
 {
 	glUniformMatrix3fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
-void c_shader_loader::setMat4(GLuint program, const std::string& name, const glm::mat4& mat)
+void c_shader_loader::set_mat_4(GLuint program, const std::string& name, const glm::mat4& mat)
 {
 	glUniformMatrix4fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }

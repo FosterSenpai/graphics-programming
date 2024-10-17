@@ -34,7 +34,7 @@ GLfloat delta_time;
 int frame_count = 0;
 double elapsed_time = 0.0;
 
-// Define the mouse callback function.
+// Link the mouse callback to the camera mouse input function.
 void mouse_callback(GLFWwindow* glfw_window, double x_pos, double y_pos)
 {
     camera.mouse_input(window, x_pos, y_pos);
@@ -100,21 +100,22 @@ void initial_setup()
 	// Set Global Blending.
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Set to general blend.
-
     // Enable depth testing.
     glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-
 	// Enable face culling.
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+
 	// Flip the images vertically.
 	stbi_set_flip_vertically_on_load(true);
+
     // Hide & capture the cursor.
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // Set the mouse callback function.
-    glfwSetCursorPosCallback(window, mouse_callback); // Add this line
+    glfwSetCursorPosCallback(window, mouse_callback);
+
     // Create the shader program.
 	shader_program = c_shader_loader::create_program("test.vert", "test.frag");
 
@@ -127,15 +128,18 @@ void initial_setup()
 
 
     // Create multiple cube objects with different positions.
-	cubes.push_back(new c_cube(textures, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
-	cubes.push_back(new c_cube(textures, glm::vec3(1.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
-	cubes.push_back(new c_cube(textures, glm::vec3(-1.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
-	cubes.push_back(new c_cube(textures, glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
-	cubes.push_back(new c_cube(textures, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
-	cubes.push_back(new c_cube(textures, glm::vec3(1.0f, 1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
-	cubes.push_back(new c_cube(textures, glm::vec3(-1.0f, -1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
 	cubes.push_back(new c_cube(textures, glm::vec3(1.0f, -1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(-1.0f, -1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+
+	cubes.push_back(new c_cube(textures, glm::vec3(1.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(-1.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+
+	cubes.push_back(new c_cube(textures, glm::vec3(1.0f, 1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
 	cubes.push_back(new c_cube(textures, glm::vec3(-1.0f, 1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+
 
 
 
@@ -183,8 +187,8 @@ void render()
 
     
     // Pass camera matrices to the shader.
-    c_shader_loader::setMat4(shader_program, "projection", camera.get_projection_matrix());
-    c_shader_loader::setMat4(shader_program, "view", camera.get_view_matrix());
+    c_shader_loader::set_mat_4(shader_program, "projection", camera.get_projection_matrix());
+    c_shader_loader::set_mat_4(shader_program, "view", camera.get_view_matrix());
 
 	// Set wireframe mode if enabled
     if (wireframe_mode)
@@ -197,9 +201,18 @@ void render()
     }
 
 	// == DRAW OBJECTS HERE ==
-    for (auto& cube : cubes)
+
+	// Make cubes disappear over time.
+    // Calculate the current segment (0 to 9)
+    int segment = static_cast<int>(current_time) % 20 / 2;
+
+    // Determine the number of cubes to draw
+    int cubes_to_draw = static_cast<int>(cubes.size()) - segment;
+
+    // Draw the appropriate number of cubes
+    for (int i = 0; i < cubes_to_draw; ++i)
     {
-        cube->draw(shader_program);
+        cubes[i]->draw(shader_program);
     }
 
 	// == END OF RENDERING PIPELINE ==

@@ -20,6 +20,13 @@
 class c_cube {
 public:
     // == Constructors and Destructors ==
+    /**
+     * @brief Construct a new c_cube object.
+     * @param textures A vector of textures to apply to the cube.
+     * @param pos The position of the cube in the world relative to the origin.
+     * @param rot The rotation of the cube in degrees.
+     * @param scl The scale of the cube.
+     */
     c_cube(const std::vector<s_texture>& textures, glm::vec3 pos, float rot, glm::vec3 scl);
 
     // == Public Methods ==

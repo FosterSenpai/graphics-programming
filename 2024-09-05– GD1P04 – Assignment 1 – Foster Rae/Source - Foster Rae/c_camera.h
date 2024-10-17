@@ -10,6 +10,12 @@
 // Mail : Foster.Rae@mds.ac.nz
 // ************************************************************************/
 
+// TODO: Camera needs to move orbital around the origin
+// a & d should move the camera left and right,
+// w & s should move the camera closer and further away from the origin.
+// add ability to change between, automatic orbital movement and manual orbital movement and free movement.
+// use polar coordinates to move the camera around the origin.
+
 #pragma once
 #include <glfw3.h>
 #include <ext/matrix_float4x4.hpp>
@@ -29,22 +35,35 @@ public:
 	 * @param delta_time The time between frames. (float)
 	 */
 	void update(float delta_time);
+	/**
+	 * @brief Processes the input from the keyboard.
+	 * @param window The window to check the input from.
+	 * @param delta_time The time between frames. (float)
+	 */
 	void process_input(GLFWwindow* window, float delta_time);
+	/**
+	 * @brief Processes the mouse input.
+	 * @param window The window to check the input from.
+	 * @param x_pos A double representing the x position of the mouse.
+	 * @param y_pos A double representing the y position of the mouse.
+	 */
 	void mouse_input(GLFWwindow* window, double x_pos, double y_pos);
-	void switch_camera_mode(); // Use to swap modes on input.
-
+	/**
+	 * @brief Switches the camera mode between FPS and target camera.
+	 */
+	void switch_camera_mode();
 
 	// == Accessors & Mutators ==
-	void set_position(glm::vec3 position) { position_ = position; }
-	void set_look_dir(glm::vec3 look_dir) { look_dir_ = look_dir; }
-	void set_up_dir(glm::vec3 up_dir) { up_dir_ = up_dir; }
-	void set_target_position(glm::vec3 target_position) { target_position_ = target_position; }
-	void set_projection_matrix(const glm::mat4& projection_matrix) { projection_matrix_ = projection_matrix; }
-	void set_view_matrix(const glm::mat4& view_matrix) { view_matrix_ = view_matrix; }
-	void set_camera_speed(float camera_speed) { camera_speed_ = camera_speed; }
-	void set_sensitivity(float sensitivity) { sensitivity_ = sensitivity; }
-	void set_window_size(int width, int height) { window_width_ = width; window_height_ = height; }
-	void set_view_distance(float view_distance) { view_distance_ = view_distance; }
+	void set_position(glm::vec3 position) { position_ = position; }											   // Set the position of the camera.
+	void set_look_dir(glm::vec3 look_dir) { look_dir_ = look_dir; }                                            // Set the direction the camera is looking.
+	void set_up_dir(glm::vec3 up_dir) { up_dir_ = up_dir; }													   // Set the up direction of the camera.
+	void set_target_position(glm::vec3 target_position) { target_position_ = target_position; }				   // Set the target position of the camera.
+	void set_projection_matrix(const glm::mat4& projection_matrix) { projection_matrix_ = projection_matrix; } // Set the projection matrix.
+	void set_view_matrix(const glm::mat4& view_matrix) { view_matrix_ = view_matrix; }						   // Set the view matrix.
+	void set_camera_speed(float camera_speed) { camera_speed_ = camera_speed; }								   // Set the speed the camera moves at.
+	void set_sensitivity(float sensitivity) { sensitivity_ = sensitivity; }									   // Set the mouse sensitivity.
+	void set_window_size(int width, int height) { window_width_ = width; window_height_ = height; }			   // Set the window size.
+	void set_view_distance(float view_distance) { view_distance_ = view_distance; }							   // Set the view distance.
 
 	glm::vec3 get_position() const { return position_; }
 	glm::vec3 get_look_dir() const { return look_dir_; }

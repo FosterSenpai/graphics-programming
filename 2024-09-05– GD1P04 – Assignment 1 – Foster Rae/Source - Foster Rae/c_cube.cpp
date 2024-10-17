@@ -56,7 +56,7 @@ c_cube::c_cube(const std::vector<s_texture>& textures, glm::vec3 pos, float rot,
 void c_cube::draw(GLuint shader_program) {
 	// Send the model matrix to the shader.
 	update_model_matrix();
-	c_shader_loader::setMat4(shader_program, "transform", model_matrix);
+	c_shader_loader::set_mat_4(shader_program, "transform", model_matrix);
     mesh_.draw(shader_program);
 }
 

@@ -25,7 +25,7 @@ void main()
 	
 	vec4 diffuse_color = (diffuse1 + diffuse2 + diffuse3) / 3.0;
 	vec4 specular_color = (specular1 + specular2 + specular3) / 3.0;
-	
+
 	diffuse_color = diffuse_color * 0.3; // Darken the diffuse color. Remove later
 	vec4 color = diffuse_color + specular_color;
 	
