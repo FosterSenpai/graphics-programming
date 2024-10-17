@@ -7,6 +7,7 @@ c_camera::c_camera()
 {
 	// Set default values.
 	position_ = glm::vec3(0.0f, 0.0f, 3.0f); // Camera starts at 3 units back.
+	previous_position_ = position_;
 	look_dir_ = glm::vec3(
 		(cos(glm::radians(yaw_)) * cos(glm::radians(pitch_))),
 		(sin(glm::radians(pitch_))),
@@ -14,6 +15,7 @@ c_camera::c_camera()
 	up_dir_ = glm::vec3(0.0f, 1.0f, 0.0f);
 	target_position_ = glm::vec3(0.0f, 0.0f, 0.0f); // Target camera is pointing at origin.
     is_target_camera_ = false; // Default to FPS camera.
+	last_tab_time_ = 0.0f;
 
     // Set default matrices.
 	projection_matrix_ = glm::mat4(1.0f);
@@ -37,34 +39,29 @@ void c_camera::update(float delta_time)
 	// Perspective Projection Matrix.
     projection_matrix_ = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width_)/static_cast<float>(window_height_), 0.1f, view_distance_);
 	//Todo: Orthographic Projection Matrix for UI elements.
+
+	// Update the current time.
+	current_time += delta_time;
 }
 
 void c_camera::process_input(GLFWwindow* window, float delta_time)
 {
-	// Check if the camera is in target mode.
-	if (is_target_camera_)
+	// Camera Movement Controls/
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // Move forward.
 	{
-		// Todo: Target Camera Controls (Move while looking at a target)
+		position_ += get_camera_speed() * delta_time * look_dir_;
 	}
-	else
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // Move backward.
 	{
-		// FPS Camera Controls
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // Move forward.
-		{
-			position_ += get_camera_speed() * delta_time * look_dir_;
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // Move backward.
-		{
-			position_ -= get_camera_speed() * delta_time * look_dir_;
-		}
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // Move left.
-		{
-			position_ -= glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // Move right.
-		{
-			position_ += glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
-		}
+		position_ -= get_camera_speed() * delta_time * look_dir_;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // Move left.
+	{
+		position_ -= glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // Move right.
+	{
+		position_ += glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
 	}
 	// If space is pressed, move up.
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
@@ -88,7 +85,12 @@ void c_camera::process_input(GLFWwindow* window, float delta_time)
 	// If tab is pressed, switch camera mode.
 	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
 	{
-		switch_camera_mode();
+        if (current_time - last_tab_time_ > 0.5f) // Check if 0.5 seconds have passed
+        {
+
+            switch_camera_mode();
+            last_tab_time_ = current_time; // Update last_tab_time
+        }
 	}
 }
 
@@ -107,8 +109,8 @@ void c_camera::mouse_input(GLFWwindow* window, double x_pos, double y_pos)
 	}
 
 	// Offset since last frame.
-	float x_offset = x_pos - last_x_;
-	float y_offset = last_y_ - y_pos;
+	float x_offset = static_cast<float>(x_pos - last_x_);
+	float y_offset = static_cast<float>(last_y_ - y_pos);
 	last_x_ = x_pos;
 	last_y_ = y_pos;
 
@@ -135,4 +137,23 @@ void c_camera::mouse_input(GLFWwindow* window, double x_pos, double y_pos)
 	(cos(glm::radians(yaw_)) * cos(glm::radians(pitch_))),
 	(sin(glm::radians(pitch_))),
 	(sin(glm::radians(yaw_)) * cos(glm::radians(pitch_)))));
+}
+
+void c_camera::switch_camera_mode()
+{
+	if (is_target_camera_)
+    {
+        // Switch to FPS camera and restore the previous position
+        position_ = previous_position_;
+        is_target_camera_ = false;
+
+		// Reset mouse state
+        first_mouse_ = true;
+    }
+    else
+    {
+        // Save the current position and switch to target camera
+        previous_position_ = position_;
+        is_target_camera_ = true;
+    }
 }

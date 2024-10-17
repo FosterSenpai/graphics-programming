@@ -1,6 +1,8 @@
 ﻿#include "c_cube.h"
 
-c_cube::c_cube(const std::vector<s_texture>& textures)
+#include "c_shader_loader.h"
+
+c_cube::c_cube(const std::vector<s_texture>& textures, glm::vec3 pos, float rot, glm::vec3 scl)
     : mesh_(c_mesh(
         {
 			// Front face
@@ -48,9 +50,21 @@ c_cube::c_cube(const std::vector<s_texture>& textures)
 			20, 21, 23, // Bottom face
 			21, 22, 23
         },
-        textures))
+        textures)), position(pos), rotation(rot), scale(scl)
 {} // This looks super weird, but it works. It's a member initializer list.
 
 void c_cube::draw(GLuint shader_program) {
+	// Send the model matrix to the shader.
+	update_model_matrix();
+	c_shader_loader::setMat4(shader_program, "transform", model_matrix);
     mesh_.draw(shader_program);
+}
+
+void c_cube::update_model_matrix()
+{
+	// Update the model matrix.
+	model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::translate(model_matrix, position);
+    model_matrix = glm::rotate(model_matrix, glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+    model_matrix = glm::scale(model_matrix, scale);
 }

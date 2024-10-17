@@ -24,7 +24,7 @@ std::string window_title;
 c_camera camera;
 bool wireframe_mode = false;
 GLuint vao, vbo, ebo;
-c_cube* cube_1;// Create a cube object.
+std::vector<c_cube*> cubes; // Vector of cube objects.
 GLuint shader_program;
 // Time variables.
 GLfloat current_time;
@@ -87,7 +87,11 @@ int main()
 
 	// Clean up.
 	glfwTerminate();
-	delete cube_1; // Clean up the cube object.
+	// Delete the cube objects.
+	for (auto& cube : cubes)
+	{
+		delete cube;
+	}
 	return 0;
 }
 
@@ -121,8 +125,19 @@ void initial_setup()
 	texture1.type = "texture_diffuse";
 	textures.push_back(texture1);
 
-	// Create the cube object.
-	cube_1 = new c_cube(textures); // Initialize the cube
+
+    // Create multiple cube objects with different positions.
+	cubes.push_back(new c_cube(textures, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(1.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(-1.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(1.0f, 1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(-1.0f, -1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(1.0f, -1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+	cubes.push_back(new c_cube(textures, glm::vec3(-1.0f, 1.0f, 0.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f)));
+
+
 
     // Prepare the window.
     glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -167,9 +182,7 @@ void render()
 	glUseProgram(shader_program);
 
     
-    // Pass transformation matrices to the shader
-    glm::mat4 transform = glm::mat4(1.0f);
-    c_shader_loader::setMat4(shader_program, "transform", transform);
+    // Pass camera matrices to the shader.
     c_shader_loader::setMat4(shader_program, "projection", camera.get_projection_matrix());
     c_shader_loader::setMat4(shader_program, "view", camera.get_view_matrix());
 
@@ -184,7 +197,10 @@ void render()
     }
 
 	// == DRAW OBJECTS HERE ==
-	cube_1->draw(shader_program);
+    for (auto& cube : cubes)
+    {
+        cube->draw(shader_program);
+    }
 
 	// == END OF RENDERING PIPELINE ==
 	glBindVertexArray(0); // Unbind the vao.
