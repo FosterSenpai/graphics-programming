@@ -18,28 +18,32 @@ Mail : Foster.Rae@mds.ac.nz
  *
  *	Create a mesh class and spawn multiple cubes on the screen at once.
  *		Mesh class can be like a blueprint/template with instructions on how to render a certain structure (object).
- *			Make sure it contains the VAO, VBO, EBO, and the draw function.
+ *			Make sure it contains the vao, vbo, EBO, and the draw function.
  */
 
 
 #include <stb_image.h>
 #include "c_graphics_utils.h"
 #include <gtc/type_ptr.hpp>
-#include "c_quad.h"
-#include "c_triangle.h"
+#include "c_structs.h"
+#include "c_camera.h"
 
 // == Global Variables ==
-int window_width = 800;
-int window_height = 800;
 GLFWwindow* window;
 GLfloat current_time;
+GLfloat previous_time = 0.0f;
+GLfloat delta_time;
 GLuint shader_program;
+c_camera camera;
+GLuint vao, vbo, ebo;
+
+// Define the mouse callback function.
+void mouse_callback(GLFWwindow* glfw_window, double x_pos, double y_pos)
+{
+    camera.mouse_input(window, x_pos, y_pos);
+}
 
 // ==== CREATE SHAPES HERE ====
-c_quad background_quad(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(2.0f), false);
-c_quad quad1(glm::vec3(-0.55f, -0.18f, 0.0f), 0.0f, glm::vec3(1.0f), false);
-c_quad quad2(glm::vec3(0.55f, -0.18f, 0.0f), 0.0f, glm::vec3(1.0f), false);
-c_quad coin(glm::vec3(0.8f, 0.8f, 0.0f), 0.0f, glm::vec3(0.2f), true);
 
 // == Function Prototypes ==
 /**
@@ -54,19 +58,26 @@ void update();
  * @brief Handles drawing objects and sending information to the shaders.
  */
 void render();
+/**
+ * @brief Handles input processing.
+ */
+void process_input(void* glfw_window);
 
 int main()
 {
 	// Initialize GLFW.
 	c_graphics_utils::initialize_glfw();
+
 	// Create a window.
-	window = c_graphics_utils::create_window(window_width, window_height, "OpenGL Pipeline");
+	window = c_graphics_utils::create_window(camera.get_window_width(), camera.get_window_height(), "OpenGL Pipeline");
 	if (!window)
 		{
 			return -1; // Return an error code.
 		}
+
 	// Initialize GLEW.
 	c_graphics_utils::initialize_glew();
+
 	// Set up the pipeline.
 	initial_setup();
 
@@ -86,55 +97,35 @@ void initial_setup()
 {
 	// Set Global Blending.
 	glEnable(GL_BLEND);
+    // Enable depth testing.
+    glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Set to general blend.
 	// Flip the images vertically.
 	stbi_set_flip_vertically_on_load(true);
+    // Hide & capture the cursor.
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // Set the mouse callback function.
+    glfwSetCursorPosCallback(window, mouse_callback); // Add this line
+    // Create the shader program.
+	shader_program = c_shader_loader::create_program("test.vert", "test.frag");
 
-	// Create the shader program.
-	shader_program = c_shader_loader::create_program("vertex_shader.vert", "fragment_shader.frag");
+	// === LOAD TEXTURES HERE ===
 
-	// ==== INIT OBJECTS HERE ====
-	background_quad.init();
-	quad1.init();
-	quad2.init();
-	coin.init();
-
-	// ==== ADD TEXTURES HERE ====
-	background_quad.add_texture("Resources/Textures/s2U4Qp6.PNG");
-	quad1.add_texture("Resources/Textures/left_hand.PNG");
-	quad2.add_texture("Resources/Textures/right_hand.PNG");
-	coin.add_texture("Resources/Textures/coin/tile000.PNG");
-	coin.add_texture("Resources/Textures/coin/tile001.PNG");
-	coin.add_texture("Resources/Textures/coin/tile002.PNG");
-	coin.add_texture("Resources/Textures/coin/tile003.PNG");
-	coin.add_texture("Resources/Textures/coin/tile004.PNG");
-	coin.add_texture("Resources/Textures/coin/tile005.PNG");
-	coin.add_texture("Resources/Textures/coin/tile006.PNG");
-	coin.add_texture("Resources/Textures/coin/tile007.PNG");
-	coin.add_texture("Resources/Textures/coin/tile008.PNG");
-	coin.add_texture("Resources/Textures/coin/tile009.PNG");
-	coin.add_texture("Resources/Textures/coin/tile010.PNG");
-	coin.add_texture("Resources/Textures/coin/tile011.PNG");
-	coin.add_texture("Resources/Textures/coin/tile012.PNG");
-	coin.add_texture("Resources/Textures/coin/tile013.PNG");
-	coin.add_texture("Resources/Textures/coin/tile014.PNG");
-
-
-	// Prepare the window.
-	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
-	glViewport(0, 0, window_width, window_height); // Maps the range of the window size to NDC space.
+    // Prepare the window.
+    glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
+    glViewport(0, 0, camera.get_window_width(), camera.get_window_height()); // Maps the range of the window size to NDC space.
 }
 void update()
 {
-	// Get the current time.
-	current_time = glfwGetTime();
-
-	// ==== APPLY TRANSFORMS HERE ====
-	background_quad.update_model_matrix();
-	quad1.update_model_matrix();
-	quad2.update_model_matrix();
-	coin.update_model_matrix();
-
+	// Update Time.
+	current_time = static_cast<GLfloat>(glfwGetTime());
+	delta_time = current_time - previous_time;
+	previous_time = current_time;
+	// Process Input.
+	process_input(window);
+	camera.process_input(window, delta_time);
+	// Update the camera.
+	camera.update(delta_time);
 	// Poll for and process events.
 	glfwPollEvents();
 }
@@ -142,21 +133,33 @@ void render()
 {
 	// Clear the colour buffer and depth buffer.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	// Use the shader program.
-	glUseProgram(shader_program);
+
 	// Send the current time to the shader.
     glUniform1f(glGetUniformLocation(shader_program, "time"), current_time);
+
 	// == START OF RENDERING PIPELINE ==
 
-	// ==== SEND UNIFORMS HERE ====
 	// ==== DRAW CALLS HERE ====
-	background_quad.draw(shader_program);
-	quad1.draw(shader_program);
-    quad2.draw(shader_program);
-	coin.draw(shader_program);
+
+	// Use the shader program.
+	glUseProgram(shader_program);
+
+    // pass transformation matrices to the shader
+    c_shader_loader::setMat4(shader_program,"projection", camera.get_projection_matrix());
+    c_shader_loader::setMat4(shader_program,"view", camera.get_view_matrix());
+
+	// Bind the vao before drawing.
+	glBindVertexArray(vao);
 
 	// == END OF RENDERING PIPELINE ==
-	glBindVertexArray(0); // Unbind the VAO.
+	glBindVertexArray(0); // Unbind the vao.
 	glUseProgram(0); // Stop using the program object. Deactivate the program object.
 	glfwSwapBuffers(window); // Swap the front and back buffers. End of the rendering pipeline.
+}
+
+void process_input(void* glfw_window)
+{
+	// Close the window if the escape key is pressed.
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
 }

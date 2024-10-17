@@ -1,15 +1,19 @@
 #version 460 core
 
 // Input from vertex shader
-in vec3 frag_color; // Dont Change.
-in vec2 frag_tex_coords; // Dont Change.
+in vec2 frag_tex_coords; // Texture coordinates from vertex shader
+in vec3 frag_normal;     // Normal from vertex shader
+in vec3 frag_position;   // Position from vertex shader
 
 // Uniform inputs
-// Receive textures here and set final_color to the texture you want to display.
-uniform sampler2D textures[16]; // Dont Change. Max textures a shape can have is 16.
-uniform int texture_count;      // Dont Change. Use this to for end of iteration loop.
-uniform bool is_animated;       // Dont Change. Use this to check if the texture is animated.
-uniform float time;             // Dont Change. Use this to animate the texture.
+// Objects can have 3 Diffuse textures and 3 Specular textures.
+uniform sampler2D texture_diffuse_1;
+uniform sampler2D texture_diffuse_2;
+uniform sampler2D texture_diffuse_3;
+uniform sampler2D texture_specular_1;
+uniform sampler2D texture_specular_2;
+uniform sampler2D texture_specular_3;
+uniform vec3 view_position;  // Camera position
 
 // Output
 out vec4 final_color; // Dont Change.
@@ -17,22 +21,23 @@ out vec4 final_color; // Dont Change.
 // Shader functionality
 void main()
 {
-    vec4 color;
+    // Sample the diffuse textures
+    vec4 diffuse1 = texture(texture_diffuse_1, frag_tex_coords);
+    vec4 diffuse2 = texture(texture_diffuse_2, frag_tex_coords);
+    vec4 diffuse3 = texture(texture_diffuse_3, frag_tex_coords);
 
-    if (is_animated) {
-        // Calculate the frame index based on time
-        int frame_index = int(time * 8) % texture_count; // Adjust the multiplier to control animation speed
+    // Sample the specular textures
+    vec4 specular1 = texture(texture_specular_1, frag_tex_coords);
+    vec4 specular2 = texture(texture_specular_2, frag_tex_coords);
+    vec4 specular3 = texture(texture_specular_3, frag_tex_coords);
 
-        // Debugging: Ensure frame_index is within bounds
-        if (frame_index < 0 || frame_index >= texture_count) {
-            color = vec4(1.0, 0.0, 0.0, 1.0); // Red color for debugging
-        } else {
-            color = texture(textures[frame_index], frag_tex_coords);
-        }
-    } else {
-        // Use the first texture as the base for static shapes
-        color = texture(textures[0], frag_tex_coords);
-    }
+    // Blend the textures together
+    vec4 diffuse_color = (diffuse1 + diffuse2 + diffuse3) / 3.0;
+    vec4 specular_color = (specular1 + specular2 + specular3) / 3.0;
 
+    // Combine diffuse and specular colors
+    vec4 color = diffuse_color + specular_color;
+
+    // Set the final color
     final_color = color;
 }

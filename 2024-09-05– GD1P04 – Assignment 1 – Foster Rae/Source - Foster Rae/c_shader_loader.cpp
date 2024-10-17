@@ -38,6 +38,55 @@ GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const
 	return program; 				    // return the program ID.
 }
 
+void c_shader_loader::set_bool(GLuint program, const std::string& name, bool value)
+{
+	glUniform1i(glGetUniformLocation(program, name.c_str()), static_cast<int>(value));
+}
+void c_shader_loader::set_int(GLuint program, const std::string& name, int value)
+{
+	glUniform1i(glGetUniformLocation(program, name.c_str()), value);
+}
+void c_shader_loader::set_float(GLuint program, const std::string& name, float value)
+{
+	glUniform1f(glGetUniformLocation(program, name.c_str()), value);
+}
+void c_shader_loader::setVec2(GLuint program, const std::string& name, const glm::vec2& value)
+{
+	glUniform2fv(glGetUniformLocation(program, name.c_str()), 1, &value[0]);
+}
+void c_shader_loader::set_vec2(GLuint program, const std::string& name, float x, float y)
+{
+	glUniform2f(glGetUniformLocation(program, name.c_str()), x, y); 
+}
+void c_shader_loader::setVec3(GLuint program, const std::string& name, const glm::vec3& value)
+{
+	glUniform3fv(glGetUniformLocation(program, name.c_str()), 1, &value[0]);
+}
+void c_shader_loader::set_vec3(GLuint program, const std::string& name, float x, float y, float z)
+{
+	glUniform3f(glGetUniformLocation(program, name.c_str()), x, y, z);
+}
+void c_shader_loader::setVec4(GLuint program, const std::string& name, const glm::vec4& value)
+{
+	glUniform4fv(glGetUniformLocation(program, name.c_str()), 1, &value[0]);
+}
+void c_shader_loader::set_vec4(GLuint program, const std::string& name, float x, float y, float z, float w)
+{
+	glUniform4f(glGetUniformLocation(program, name.c_str()), x, y, z, w);
+}
+void c_shader_loader::setMat2(GLuint program, const std::string& name, const glm::mat2& mat)
+{
+	glUniformMatrix2fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+void c_shader_loader::setMat3(GLuint program, const std::string& name, const glm::mat3& mat)
+{
+	glUniformMatrix3fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+void c_shader_loader::setMat4(GLuint program, const std::string& name, const glm::mat4& mat)
+{
+	glUniformMatrix4fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
 // == Private Methods ==
 GLuint c_shader_loader::create_shader(GLenum shader_type, const char* shader_name)
 {

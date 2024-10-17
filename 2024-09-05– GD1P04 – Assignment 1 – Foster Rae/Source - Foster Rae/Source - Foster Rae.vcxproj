@@ -138,26 +138,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="c_camera.h" />
     <ClInclude Include="c_graphics_utils.h" />
-    <ClInclude Include="c_quad.h" />
     <ClInclude Include="c_shader_loader.h" />
-    <ClInclude Include="c_shape.h" />
-    <ClInclude Include="c_texture_loader.h" />
-    <ClInclude Include="c_triangle.h" />
+    <ClInclude Include="c_structs.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="c_camera.cpp" />
     <ClCompile Include="c_graphics_utils.cpp" />
-    <ClCompile Include="c_quad.cpp" />
     <ClCompile Include="c_shader_loader.cpp" />
-    <ClCompile Include="c_shape.cpp" />
-    <ClCompile Include="c_texture_loader.cpp" />
-    <ClCompile Include="c_triangle.cpp" />
     <ClCompile Include="image_loader.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment_shader.frag" />
     <None Include="README.md" />
+    <None Include="test.frag" />
+    <None Include="test.vert" />
     <None Include="vertex_shader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

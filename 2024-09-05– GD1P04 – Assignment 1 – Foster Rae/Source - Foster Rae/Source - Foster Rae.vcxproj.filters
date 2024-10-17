@@ -50,6 +50,15 @@
     <ClInclude Include="c_texture_loader.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="c_camera.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="c_mesh.h">
+      <Filter>Header Files\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="c_structs.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="image_loader.cpp">
@@ -75,6 +84,12 @@
     </ClCompile>
     <ClCompile Include="c_shader_loader.cpp">
       <Filter>Source Files\Class Implementations\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="c_camera.cpp">
+      <Filter>Source Files\Class Implementations\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="c_mesh.cpp">
+      <Filter>Source Files\Class Implementations\Shapes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

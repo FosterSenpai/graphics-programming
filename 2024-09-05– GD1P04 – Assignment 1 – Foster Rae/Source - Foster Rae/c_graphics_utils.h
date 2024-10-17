@@ -42,4 +42,7 @@ public:
 	 * @return A pointer to the created window.
 	 */
 	static GLFWwindow* create_window(int width, int height, const char* title);
+
+	// == Image Loading ==
+	static GLuint load_image(const char* file_path);
 };
