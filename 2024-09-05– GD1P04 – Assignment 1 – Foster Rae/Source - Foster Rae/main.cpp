@@ -9,17 +9,6 @@ Description : Entrance point for the OpenGL pipeline.
 Author : Foster Rae
 Mail : Foster.Rae@mds.ac.nz
 ************************************************************************/
-/**
- * TODO: Exercise
- * Create and show a 3D Cube object using perspective projection.
- *
- * Create a camera class which holds the view and projection matrices.
- *     Change to Orthographic projection to see the difference. (Remember that orthographic projection needs to be scaled up)
- *
- *	Create a mesh class and spawn multiple cubes on the screen at once.
- *		Mesh class can be like a blueprint/template with instructions on how to render a certain structure (object).
- *			Make sure it contains the vao, vbo, EBO, and the draw function.
- */
 
 
 #include <stb_image.h>
@@ -126,10 +115,6 @@ void initial_setup()
 	texture1.id = c_graphics_utils::load_image("Resources/Textures/texture_diffuse1.png");
 	texture1.type = "texture_diffuse";
 	textures.push_back(texture1);
-	s_texture texture2;
-	texture2.id = c_graphics_utils::load_image("Resources/Textures/texture_diffuse6.png");
-	texture2.type = "texture_diffuse";
-	textures.push_back(texture2);
 
 	// Create the cube object.
 	cube_1 = new c_cube(textures); // Initialize the cube
