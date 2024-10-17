@@ -27,6 +27,7 @@ Mail : Foster.Rae@mds.ac.nz
 #include <gtc/type_ptr.hpp>
 #include "c_structs.h"
 #include "c_camera.h"
+#include "c_cube.h"
 
 // == Global Variables ==
 GLFWwindow* window;
@@ -35,7 +36,9 @@ GLfloat previous_time = 0.0f;
 GLfloat delta_time;
 GLuint shader_program;
 c_camera camera;
+bool wireframe_mode = false;
 GLuint vao, vbo, ebo;
+c_cube* cube_1;// Create a cube object.
 
 // Define the mouse callback function.
 void mouse_callback(GLFWwindow* glfw_window, double x_pos, double y_pos)
@@ -90,6 +93,7 @@ int main()
 
 	// Clean up.
 	glfwTerminate();
+	delete cube_1; // Clean up the cube object.
 	return 0;
 }
 
@@ -97,9 +101,16 @@ void initial_setup()
 {
 	// Set Global Blending.
 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Set to general blend.
+
     // Enable depth testing.
     glEnable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Set to general blend.
+	glDepthFunc(GL_LESS);
+
+	// Enable face culling.
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 	// Flip the images vertically.
 	stbi_set_flip_vertically_on_load(true);
     // Hide & capture the cursor.
@@ -110,6 +121,18 @@ void initial_setup()
 	shader_program = c_shader_loader::create_program("test.vert", "test.frag");
 
 	// === LOAD TEXTURES HERE ===
+	std::vector<s_texture> textures;
+	s_texture texture1;
+	texture1.id = c_graphics_utils::load_image("Resources/Textures/texture_diffuse1.png");
+	texture1.type = "texture_diffuse";
+	textures.push_back(texture1);
+	s_texture texture2;
+	texture2.id = c_graphics_utils::load_image("Resources/Textures/texture_diffuse6.png");
+	texture2.type = "texture_diffuse";
+	textures.push_back(texture2);
+
+	// Create the cube object.
+	cube_1 = new c_cube(textures); // Initialize the cube
 
     // Prepare the window.
     glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -139,17 +162,28 @@ void render()
 
 	// == START OF RENDERING PIPELINE ==
 
-	// ==== DRAW CALLS HERE ====
-
 	// Use the shader program.
 	glUseProgram(shader_program);
 
-    // pass transformation matrices to the shader
-    c_shader_loader::setMat4(shader_program,"projection", camera.get_projection_matrix());
-    c_shader_loader::setMat4(shader_program,"view", camera.get_view_matrix());
+    
+    // Pass transformation matrices to the shader
+    glm::mat4 transform = glm::mat4(1.0f);
+    c_shader_loader::setMat4(shader_program, "transform", transform);
+    c_shader_loader::setMat4(shader_program, "projection", camera.get_projection_matrix());
+    c_shader_loader::setMat4(shader_program, "view", camera.get_view_matrix());
 
-	// Bind the vao before drawing.
-	glBindVertexArray(vao);
+	// Set wireframe mode if enabled
+    if (wireframe_mode)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    else
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+
+	// == DRAW OBJECTS HERE ==
+	cube_1->draw(shader_program);
 
 	// == END OF RENDERING PIPELINE ==
 	glBindVertexArray(0); // Unbind the vao.
@@ -162,4 +196,15 @@ void process_input(void* glfw_window)
 	// Close the window if the escape key is pressed.
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
+
+	    // Toggle wireframe mode if Caps Lock is pressed.
+    if (glfwGetKey(window, GLFW_KEY_CAPS_LOCK) == GLFW_PRESS)
+    {
+        wireframe_mode = !wireframe_mode;
+        // Add a small delay to prevent rapid toggling.
+        while (glfwGetKey(window, GLFW_KEY_CAPS_LOCK) == GLFW_PRESS)
+        {
+            glfwPollEvents();
+        }
+    }
 }

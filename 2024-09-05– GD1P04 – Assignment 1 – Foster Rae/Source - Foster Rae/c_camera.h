@@ -5,7 +5,7 @@
 // New Zealand
 // (c) 2024 Media Design School
 // File Name : c_camera.h
-// Description : ????????? FILL OUT ?????????
+// Description : Class to handle the camera movement and view + projection matrices.
 // Author : Foster Rae
 // Mail : Foster.Rae@mds.ac.nz
 // ************************************************************************/
