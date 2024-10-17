@@ -44,5 +44,11 @@ public:
 	static GLFWwindow* create_window(int width, int height, const char* title);
 
 	// == Image Loading ==
+	/**
+	 * @brief Loads an image from the file path provided.
+	 *
+	 * @param file_path The file path to the image.
+	 * @return The ID of the loaded image.
+	 */
 	static GLuint load_image(const char* file_path);
 };

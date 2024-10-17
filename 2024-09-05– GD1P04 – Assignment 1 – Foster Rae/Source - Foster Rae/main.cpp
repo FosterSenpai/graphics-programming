@@ -20,14 +20,19 @@ Mail : Foster.Rae@mds.ac.nz
 
 // == Global Variables ==
 GLFWwindow* window;
-GLfloat current_time;
-GLfloat previous_time = 0.0f;
-GLfloat delta_time;
-GLuint shader_program;
+std::string window_title;
 c_camera camera;
 bool wireframe_mode = false;
 GLuint vao, vbo, ebo;
 c_cube* cube_1;// Create a cube object.
+GLuint shader_program;
+// Time variables.
+GLfloat current_time;
+GLfloat previous_time = 0.0f;
+GLfloat delta_time;
+// Frame per second variables.
+int frame_count = 0;
+double elapsed_time = 0.0;
 
 // Define the mouse callback function.
 void mouse_callback(GLFWwindow* glfw_window, double x_pos, double y_pos)
@@ -61,7 +66,7 @@ int main()
 	c_graphics_utils::initialize_glfw();
 
 	// Create a window.
-	window = c_graphics_utils::create_window(camera.get_window_width(), camera.get_window_height(), "OpenGL Pipeline");
+	window = c_graphics_utils::create_window(camera.get_window_width(), camera.get_window_height(), window_title.c_str());
 	if (!window)
 		{
 			return -1; // Return an error code.
@@ -136,6 +141,17 @@ void update()
 	camera.update(delta_time);
 	// Poll for and process events.
 	glfwPollEvents();
+	// Calculate the frames per second.
+	frame_count++;
+    elapsed_time += delta_time;
+    if (elapsed_time >= 0.5) // Update every half second.
+    {
+        double fps = frame_count / elapsed_time;
+        window_title = "Foster's Pipeline - FPS: " + std::to_string(fps);
+        glfwSetWindowTitle(window, window_title.c_str());
+        frame_count = 0;
+        elapsed_time = 0.0;
+    }
 }
 void render()
 {

@@ -41,7 +41,6 @@ GLFWwindow* c_graphics_utils::create_window(int width, int height, const char* t
 	glfwMakeContextCurrent(window);
 	return window; // Return the window if it was successfully created.
 }
-
 GLuint c_graphics_utils::load_image(const char* file_path)
 {
 	// Get the data, and variables for the image.
