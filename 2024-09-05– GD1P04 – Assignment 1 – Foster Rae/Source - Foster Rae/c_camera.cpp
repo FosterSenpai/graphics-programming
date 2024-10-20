@@ -6,101 +6,150 @@
 c_camera::c_camera()
 {
 	// Set default values.
-	position_ = glm::vec3(0.0f, 0.0f, 3.0f); // Camera starts at 3 units back.
+	position_ = glm::vec3(0.0f, -2.0f, 10.0f); // Camera starts at 10 units back.
 	previous_position_ = position_;
+	previous_free_position_ = position_;
 	look_dir_ = glm::vec3(
 		(cos(glm::radians(yaw_)) * cos(glm::radians(pitch_))),
 		(sin(glm::radians(pitch_))),
 		(sin(glm::radians(yaw_)) * cos(glm::radians(pitch_))));
-	up_dir_ = glm::vec3(0.0f, 1.0f, 0.0f);
-	target_position_ = glm::vec3(0.0f, 0.0f, 0.0f); // Target camera is pointing at origin.
-    is_target_camera_ = false; // Default to FPS camera.
+    right_vector_ = glm::normalize(glm::cross(look_dir_, up_dir_));
+	up_dir_ = glm::vec3(0.0f, 1.0f, 0.0f); // Set to world up.
+	target_position_ = glm::vec3(0.0f, -2.0f, -3.0f); // Target camera is pointing at origin.
 	last_tab_time_ = 0.0f;
+	orbit_radius_ = 10.0f;
+	orbit_angle_ = 0.0f;
+	orbit_height = orbit_radius_ * 0.5f;
+	is_target_camera_ = true;
 
     // Set default matrices.
 	projection_matrix_ = glm::mat4(1.0f);
     view_matrix_ = glm::mat4(1.0f);
 }
 
-void c_camera::update(float delta_time)
+void c_camera::update(GLFWwindow* window, float delta_time)
 {
-	// Check if the camera is in target mode.
-	if (is_target_camera_)
-	{
-		// Calculate the view matrix for target camera.
-		view_matrix_ = glm::lookAt(position_, target_position_, up_dir_);
-	}
-	else
-	{
-		// Calculate the view matrix for FPS camera.
-		view_matrix_ = glm::lookAt(position_, position_ + look_dir_, up_dir_);
-	}
+    // Process camera input.
+    process_input(window, delta_time);
 
-	// Perspective Projection Matrix.
-    projection_matrix_ = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width_)/static_cast<float>(window_height_), 0.1f, view_distance_);
-	//Todo: Orthographic Projection Matrix for UI elements.
+    if (is_target_camera_ || is_manual_camera_)
+    {
+        // Convert polar coordinates to Cartesian coordinates.
+        position_.x = target_position_.x + orbit_radius_ * cos(glm::radians(orbit_angle_));
+        position_.z = target_position_.z + orbit_radius_ * sin(glm::radians(orbit_angle_));
+        position_.y = target_position_.y + orbit_height; // Maintain a constant height.
+		orbit_height = orbit_radius_ * 0.5f; // Keep the camera at a fixed height.
 
-	// Update the current time.
-	current_time += delta_time;
+		// Update the look direction for movement in orbit mode.
+        look_dir_ = glm::normalize(target_position_ - position_);
+
+        // Calculate the view matrix for the orbital camera.
+        view_matrix_ = glm::lookAt(position_, target_position_, up_dir_);
+    }
+    else
+    {
+        // Calculate the view matrix for FPS camera.
+        view_matrix_ = glm::lookAt(position_, position_ + look_dir_, up_dir_);
+    }
+
+    // Update right vector.
+    right_vector_ = glm::normalize(glm::cross(look_dir_, up_dir_));
+
+    // Perspective Projection Matrix.
+    projection_matrix_ = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width_) / static_cast<float>(window_height_), 0.1f, view_distance_);
+
+    // Update the current time.
+    current_time += delta_time;
 }
 
 void c_camera::process_input(GLFWwindow* window, float delta_time)
 {
-	if (!is_target_camera_) // Free Camera Movement Controls
+    glm::vec3 direction(0.0f);
+	float orbit_multiplier = 10.0f; // Orbit speed multiplier.
+
+	if (is_target_camera_) // Automatic Orbit.
+    {
+		orbit_angle_ += get_camera_speed() * delta_time * orbit_multiplier;
+    }
+    else if (is_manual_camera_) // Manual Orbit.
 	{
-		// Camera Movement Controls/
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // Move forward.
-		{
-			position_ += get_camera_speed() * delta_time * look_dir_;
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // Move backward.
-		{
-			position_ -= get_camera_speed() * delta_time * look_dir_;
-		}
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // Move left.
-		{
-			position_ -= glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // Move right.
-		{
-			position_ += glm::normalize(glm::cross(look_dir_, up_dir_)) * get_camera_speed() * delta_time;
-		}
-		// If space is pressed, move up.
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		{
-			position_ += up_dir_ * get_camera_speed() * delta_time;
-		}
-		// If left control is pressed, move down.
-		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		{
-			position_ -= up_dir_ * get_camera_speed() * delta_time;
-		}
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // Move left.
+	    {
+	        orbit_angle_ += get_camera_speed() * delta_time * orbit_multiplier;
+	    }
+	    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) // Move right.
+	    {
+	        orbit_angle_ -= get_camera_speed() * delta_time * orbit_multiplier;
+	    }
+	    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) // Move closer.
+	    {
+	        orbit_radius_ -= get_camera_speed() * delta_time * orbit_multiplier / 5; // Was a bit too fast.
+	        if (orbit_radius_ < 1.0f) // Prevent the camera from getting too close.
+	        {
+	            orbit_radius_ = 1.0f;
+	        }
+	    }
+	    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // Move further.
+	    {
+	        orbit_radius_ += get_camera_speed() * delta_time * orbit_multiplier / 5;
+	    }
 	}
-	else
+    else // Free Camera Movement Controls
 	{
-		// Sway left to right based on delta time sine wave function while in target mode.
-		position_.x = target_position_.x + get_camera_speed() * sin(current_time);
+	    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) // Move forward.
+	    {
+	        direction += look_dir_;
+	    }
+	    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // Move backward.
+	    {
+	        direction -= look_dir_;
+	    }
+	    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // Move left.
+	    {
+	        direction -= glm::normalize(glm::cross(look_dir_, up_dir_));
+	    }
+	    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) // Move right.
+	    {
+	        direction += glm::normalize(glm::cross(look_dir_, up_dir_));
+	    }
+	    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // Move up.
+	    {
+	        direction += up_dir_;
+	    }
+	    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) // Move down.
+	    {
+	        direction -= up_dir_;
+		}
+
+	    // Normalize the direction vector to handle diagonal movement.
+	    if (glm::length(direction) > 0.0f)
+	    {
+	        direction = glm::normalize(direction);
+	    }
+
+	    // Apply the movement.
+	    position_ += get_camera_speed() * delta_time * direction;
 	}
 
-	// If left shift is pressed, speed up the camera.
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-	{
-		set_camera_speed(5.0f);
-	}
-	else
-	{
-		set_camera_speed(2.5f);
-	}
-	// If tab is pressed, switch camera mode.
-	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
-	{
-        if (current_time - last_tab_time_ > 0.5f) // Check if 0.5 seconds have passed
+    // If left shift is pressed, speed up the camera.
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    {
+        set_camera_speed(5.0f);
+    }
+    else
+    {
+        set_camera_speed(2.5f);
+    }
+
+    // If tab is pressed, switch camera mode.
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
+    {
+        if (current_time - last_tab_time_ > 0.5f) // Check if 0.5 seconds have passed.
         {
-
             switch_camera_mode();
-            last_tab_time_ = current_time; // Update last_tab_time
+            last_tab_time_ = current_time; // Update last_tab_time.
         }
-	}
+    }
 }
 
 void c_camera::mouse_input(GLFWwindow* window, double x_pos, double y_pos)
@@ -131,7 +180,7 @@ void c_camera::mouse_input(GLFWwindow* window, double x_pos, double y_pos)
 	yaw_ += x_offset;
 	pitch_ += y_offset;
 
-	// Clamp pitch.
+	// Clamp pitch. (no glm in this file)
 	if (pitch_ > 89.0f)
 	{
 		pitch_ = 89.0f;
@@ -150,19 +199,22 @@ void c_camera::mouse_input(GLFWwindow* window, double x_pos, double y_pos)
 
 void c_camera::switch_camera_mode()
 {
-	if (is_target_camera_)
-    {
-        // Switch to FPS camera and restore the previous position
-        position_ = previous_position_;
-        is_target_camera_ = false;
-
-		// Reset mouse state
-        first_mouse_ = true;
-    }
-    else
-    {
-        // Save the current position and switch to target camera
-        previous_position_ = position_;
-        is_target_camera_ = true;
-    }
+	// Auto orbit -> Manual orbit -> FPS -> Auto orbit.
+	if (is_target_camera_) // Switch to manual orbit.
+	{
+		position_ = previous_position_; // Continue from the auto orbit position.
+		is_target_camera_ = false;
+		is_manual_camera_ = true;
+	}
+	else if (is_manual_camera_) // Switch to FPS.
+	{
+		previous_position_ = position_;      // Save old manual orbit pos.
+		position_ = previous_free_position_; // Restore old free cam pos.
+		is_manual_camera_ = false;
+	}
+	else // Switch to auto orbit.
+	{
+		previous_free_position_ = position_; // Save old free cam pos for changing back.
+		is_target_camera_ = true;
+	}
 }

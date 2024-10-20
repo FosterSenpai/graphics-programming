@@ -4,17 +4,6 @@
 #include<vector>
 
 #include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
-#include "c_camera.h"
 
 // == Constructors / Destructors ==
 c_shader_loader::c_shader_loader(void) = default;

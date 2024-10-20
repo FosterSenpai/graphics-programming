@@ -32,9 +32,10 @@ public:
 	// == Public Methods ==
 	/**
 	 * @brief Updates the camera position and view matrix based on the delta time.
+	 * @param window
 	 * @param delta_time The time between frames. (float)
 	 */
-	void update(float delta_time);
+	void update(GLFWwindow* window, float delta_time);
 	/**
 	 * @brief Processes the input from the keyboard.
 	 * @param window The window to check the input from.
@@ -46,6 +47,7 @@ public:
 	 * @param window The window to check the input from.
 	 * @param x_pos A double representing the x position of the mouse.
 	 * @param y_pos A double representing the y position of the mouse.
+	 * @note This function is linked to the mouse callback function.
 	 */
 	void mouse_input(GLFWwindow* window, double x_pos, double y_pos);
 	/**
@@ -64,6 +66,7 @@ public:
 	void set_sensitivity(float sensitivity) { sensitivity_ = sensitivity; }									   // Set the mouse sensitivity.
 	void set_window_size(int width, int height) { window_width_ = width; window_height_ = height; }			   // Set the window size.
 	void set_view_distance(float view_distance) { view_distance_ = view_distance; }							   // Set the view distance.
+	void set_first_mouse(bool first_mouse) { first_mouse_ = first_mouse; }									   // Set the first mouse flag.
 
 	glm::vec3 get_position() const { return position_; }
 	glm::vec3 get_look_dir() const { return look_dir_; }
@@ -74,6 +77,8 @@ public:
 	float get_camera_speed() const { return camera_speed_; }
 	int get_window_width() const { return window_width_; }
 	int get_window_height() const { return window_height_; }
+	bool get_is_target_camera() const { return is_target_camera_; }
+	bool is_manual_camera() const { return is_manual_camera_; }
 
 	// == Public Members ==
 	float current_time = 0.0f; // The current time of the camera.
@@ -82,23 +87,31 @@ private:
 
 	// == Private Members ==
 	glm::vec3 position_;           // Position of the camera.
-	glm::vec3 previous_position_;
-	glm::vec3 look_dir_;           // Direction the camera is looking.
+	glm::vec3 previous_position_; 
+	glm::vec3 previous_free_position_;
+	glm::vec3 look_dir_;           // Direction the camera is looking. Normalized so also the camera's forward vector.
+	glm::vec3 right_vector_;
 	glm::vec3 up_dir_;             // Up direction of the camera.
 	glm::vec3 target_position_;    // Position of the target camera.
-	bool is_target_camera_;        // Flag to change the view matrix from FPS to target camera.
 	float last_tab_time_;          // Time since the last tab press.
 	float camera_speed_ = 2.5f;    // Speed the camera moves at.
+
+	// Orbit variables.
+	bool is_target_camera_; // Automatic orbit flag.
+	bool is_manual_camera_ = false; // Manual orbit flag.
+	float orbit_radius_;
+	float orbit_angle_;
+	float orbit_height;
 
 	// Mouse input variables.
 	double last_x_ = 400.0f;       // x position of the mouse, initialized to the center of the screen.
     double last_y_ = 300.0f;       // y position of the mouse, initialized to the center of the screen.
     float yaw_ = -90.0f;           // Yaw is initialized to -90.0 degrees to look along the z-axis
     float pitch_ = 0.0f;
-    float sensitivity_ = 0.1f;     // Mouse sensitivity
-	bool first_mouse_ = true;      // Flag to check if the mouse has moved.
+    float sensitivity_ = 0.075f;   // Mouse sensitivity
+	bool first_mouse_ = true;      // Flag to check if the mouse has moved. (Fix for mouse jump)
 
-	int window_width_ = 800;       // Window width and height for calculating the center.
+	int window_width_ = 800;
 	int window_height_ = 800;
 	float view_distance_ = 100.0f; // Distance the camera can see.
 
