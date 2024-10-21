@@ -25,6 +25,7 @@ c_camera::c_camera()
     // Set default matrices.
 	projection_matrix_ = glm::mat4(1.0f);
     view_matrix_ = glm::mat4(1.0f);
+
 }
 
 void c_camera::update(GLFWwindow* window, float delta_time)
@@ -56,7 +57,7 @@ void c_camera::update(GLFWwindow* window, float delta_time)
     right_vector_ = glm::normalize(glm::cross(look_dir_, up_dir_));
 
     // Perspective Projection Matrix.
-    projection_matrix_ = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width_) / static_cast<float>(window_height_), 0.1f, view_distance_);
+	projection_matrix_ = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width_) / static_cast<float>(window_height_), 0.1f, view_distance_);
 
     // Update the current time.
     current_time += delta_time;
@@ -96,6 +97,11 @@ void c_camera::process_input(GLFWwindow* window, float delta_time)
 	}
     else // Free Camera Movement Controls
 	{
+		// Force the camera to update, first mouse flag not working here.
+    	double x_pos, y_pos;
+	    glfwGetCursorPos(window, &x_pos, &y_pos);
+	    mouse_input(window, x_pos, y_pos);
+
 	    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) // Move forward.
 	    {
 	        direction += look_dir_;

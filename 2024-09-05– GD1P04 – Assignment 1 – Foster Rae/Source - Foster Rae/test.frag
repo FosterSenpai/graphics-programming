@@ -1,33 +1,39 @@
 #version 460 core
+// Output.
 out vec4 FragColor;
 
+// Input from vertex shader.
 in vec2 TexCoord;
 
+// Inputs from application.
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_diffuse2;
 uniform sampler2D texture_diffuse3;
 uniform sampler2D texture_specular1;
 uniform sampler2D texture_specular2;
 uniform sampler2D texture_specular3;
-
-
-uniform float time;
+uniform int active_texture; // Uniform to select which texture to use.
+uniform float time; // This isnt being used right now. Remember to use or remove.
 
 void main()
 {
-	vec4 diffuse1 = texture(texture_diffuse1, TexCoord);
-	vec4 diffuse2 = texture(texture_diffuse2, TexCoord);
-	vec4 diffuse3 = texture(texture_diffuse3, TexCoord);
-	
-	vec4 specular1 = texture(texture_specular1, TexCoord);
-	vec4 specular2 = texture(texture_specular2, TexCoord);
-	vec4 specular3 = texture(texture_specular3, TexCoord);
-	
-	vec4 diffuse_color = (diffuse1 + diffuse2 + diffuse3) / 3.0;
-	vec4 specular_color = (specular1 + specular2 + specular3) / 3.0;
+    vec4 color;
+    if (active_texture == 0) {
+        color = texture(texture_diffuse1, TexCoord);
+    } else if (active_texture == 1) {
+        color = texture(texture_diffuse2, TexCoord);
+    } else if (active_texture == 2) {
+        color = texture(texture_diffuse3, TexCoord);
+    } else if (active_texture == 3) {
+        color = texture(texture_specular1, TexCoord);
+    } else if (active_texture == 4) {
+        color = texture(texture_specular2, TexCoord);
+    } else if (active_texture == 5) {
+        color = texture(texture_specular3, TexCoord);
+    } else {
+        color = vec4(1.0, 0.0, 1.0, 1.0); // Default to magenta if no valid texture is selected
+    }
 
-	diffuse_color = diffuse_color * 0.3; // Darken the diffuse color. Remove later
-	vec4 color = diffuse_color + specular_color;
-	
+	// Output the color.
 	FragColor = color;
 }

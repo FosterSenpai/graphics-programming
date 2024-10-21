@@ -54,12 +54,12 @@ c_cube::c_cube(const std::vector<s_texture>& textures, glm::vec3 pos, float rot,
         textures)), position_(pos), rotation_(rot), scale_(scl)
 {} // This looks super weird, but it works. It's a member initializer list.
 
-void c_cube::draw(GLuint shader_program) {
+void c_cube::draw(GLuint shader_program,int active_texture_index) {
 	// Send the model matrix to the shader.
 	update_model_matrix();
 	c_shader_loader::set_mat_4(shader_program, "transform", model_matrix_);
 	// Draw the cube.
-    mesh_.draw(shader_program);
+    mesh_.draw(shader_program, active_texture_index);
 }
 
 void c_cube::update_model_matrix()
@@ -77,7 +77,7 @@ void c_cube::move(const c_camera& camera, const glm::vec3& direction)
     {
         glm::vec3 scaled_direction = direction * speed_; // Scale the direction by the speed factor
 
-        if (camera.get_is_target_camera() || camera.is_manual_camera())
+        if (camera.get_is_target_camera() || camera.get_is_manual_camera())
         {
             // Move along the orbital camera's view matrix.
             glm::vec3 right = glm::normalize(glm::cross(camera.get_look_dir(), camera.get_up_dir()));

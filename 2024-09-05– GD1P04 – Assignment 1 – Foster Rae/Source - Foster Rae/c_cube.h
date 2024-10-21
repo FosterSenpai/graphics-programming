@@ -32,13 +32,19 @@ public:
     /**
 	 * @brief Draws the cube.
 	 * @param shader_program The shader program to use.
+	 *  @param active_texture_index The index of the texture to use.
 	 */
-    void draw(GLuint shader_program);
+    void draw(GLuint shader_program, int active_texture_index);
     /**
      * @brief Updates the model matrix of the cube ready to be sent to the shader.
      * @note Call in the main update loop. 
      */
     void update_model_matrix();
+    /**
+	 * @brief Moves the cube in the direction relative to the camera.
+	 * @param camera The camera object to get the direction from.
+	 * @param direction The direction to move the cube.
+	 */
     void move(const c_camera& camera, const glm::vec3& direction);
 
 	// == Transformation Methods ==
@@ -51,6 +57,7 @@ public:
 	float get_rotation() const { return rotation_; }
 	glm::vec3 get_scale() const { return scale_; }
 	bool get_active_cube() const { return is_active_cube_; }
+    std::vector<s_texture> get_textures() const { return mesh_.textures; }
 
 
 private:

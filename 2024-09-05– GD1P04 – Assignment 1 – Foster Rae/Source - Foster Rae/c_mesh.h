@@ -21,6 +21,7 @@ class c_mesh
 public:
 
 	// == Constructors and Destructors ==
+	c_mesh() = default; // Default constructor
     c_mesh(const std::vector<s_vertex>& vertices, const std::vector<GLuint>& indices, const std::vector<s_texture>& textures);
 
 	// == Public Methods ==
@@ -30,7 +31,7 @@ public:
 	 *
 	 * @param program_id The shader program to use.
 	 */
-	void draw(GLuint program_id);
+	void draw(GLuint program_id, int active_texture_index);
 
 	// == Public Members ==
 	GLuint vao;

@@ -32,22 +32,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="c_quad.h">
-      <Filter>Header Files\Shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="c_shape.h">
-      <Filter>Header Files\Shapes</Filter>
-    </ClInclude>
-    <ClInclude Include="c_triangle.h">
-      <Filter>Header Files\Shapes</Filter>
-    </ClInclude>
     <ClInclude Include="c_graphics_utils.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="c_shader_loader.h">
-      <Filter>Header Files\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="c_texture_loader.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="c_camera.h">
@@ -59,6 +47,9 @@
     <ClInclude Include="c_structs.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="c_cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="image_loader.cpp">
@@ -66,18 +57,6 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="c_quad.cpp">
-      <Filter>Source Files\Class Implementations\Shapes</Filter>
-    </ClCompile>
-    <ClCompile Include="c_shape.cpp">
-      <Filter>Source Files\Class Implementations\Shapes</Filter>
-    </ClCompile>
-    <ClCompile Include="c_triangle.cpp">
-      <Filter>Source Files\Class Implementations\Shapes</Filter>
-    </ClCompile>
-    <ClCompile Include="c_texture_loader.cpp">
-      <Filter>Source Files\Class Implementations\Tools</Filter>
     </ClCompile>
     <ClCompile Include="c_graphics_utils.cpp">
       <Filter>Source Files\Class Implementations\Tools</Filter>
@@ -91,14 +70,13 @@
     <ClCompile Include="c_mesh.cpp">
       <Filter>Source Files\Class Implementations\Shapes</Filter>
     </ClCompile>
+    <ClCompile Include="c_cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vertex_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="fragment_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="README.md" />
+    <None Include="test.frag" />
+    <None Include="test.vert" />
   </ItemGroup>
 </Project>

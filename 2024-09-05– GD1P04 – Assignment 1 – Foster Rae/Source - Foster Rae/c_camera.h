@@ -78,7 +78,7 @@ public:
 	int get_window_width() const { return window_width_; }
 	int get_window_height() const { return window_height_; }
 	bool get_is_target_camera() const { return is_target_camera_; }
-	bool is_manual_camera() const { return is_manual_camera_; }
+	bool get_is_manual_camera() const { return is_manual_camera_; }
 
 	// == Public Members ==
 	float current_time = 0.0f; // The current time of the camera.

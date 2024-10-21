@@ -1,12 +1,14 @@
 ﻿#include "c_mesh.h"
 
+#include "c_shader_loader.h"
+
 c_mesh::c_mesh(const std::vector<s_vertex>& vertices, const std::vector<GLuint>& indices, const std::vector<s_texture>& textures)
     : vertices(vertices), indices(indices), textures(textures) {
     // Set up the mesh data.
     setup_mesh();
 }
 
-void c_mesh::draw(GLuint program_id)
+void c_mesh::draw(GLuint program_id, int active_texture_index)
 {
     // Set the texture count.
     GLuint diffuse_count = 1;
@@ -30,6 +32,9 @@ void c_mesh::draw(GLuint program_id)
         glUniform1i(glGetUniformLocation(program_id, (name + number).c_str()), i); // Concat to get the uniform name.
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
+
+	// Set the active texture uniform.
+    glUniform1i(glGetUniformLocation(program_id, "active_texture"), active_texture_index);
 
     // Draw the mesh.
     glBindVertexArray(vao);
