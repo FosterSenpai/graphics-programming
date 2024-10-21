@@ -9,9 +9,7 @@
 // Author : Foster Rae
 // Mail : Foster.Rae@mds.ac.nz
 // ************************************************************************/
-
 #pragma once
-
 #include <glm.hpp>
 #include <string>
 
@@ -25,9 +23,9 @@
  * [ position.x, position.y, position.z, normal.x, normal.y, normal.z, tex_coords.x, tex_coords.y ]
  */
 struct s_vertex {
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 tex_coords;
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 tex_coords;
 };
 
 /**
@@ -36,6 +34,6 @@ struct s_vertex {
  * @param type The texture type. (diffuse, specular, etc.)
  */
 struct s_texture {
-    unsigned int id;
-    std::string type;
+	unsigned int id;
+	std::string type;
 };

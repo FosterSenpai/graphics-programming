@@ -1,55 +1,46 @@
 # Basic OpenGL Pipeline Project
+Foster Rae.  
+(c) 2024 Media Design School  
+GD1P04, Graphics Programming.
 
 ## Overview
-This project demonstrates a basic implementation of an OpenGL pipeline. It renders a simple triangle using hard-coded vertex data and includes a vertex and fragment shader.
+This project renders a few cube meshes to the screen using OpenGL.  
+I didn't have time to implement the model loading properly so I just used a cube mesh and passed as much of the rubric as i could without models.
 
-## Features
-- Basic OpenGL setup
-- Rendering a triangle
-- Vertex and Fragment Shaders
+Can change between different camera modes, wireframe and fill mode, and change the textures of the cubes by clicking on the ui square.
 
-## Prerequisites
-- OpenGL 3.3 or higher
-- C++11 or higher
+Camera movement is done with the `Arrow Keys`.
+
+Cube Movement is done by using `WASD` to move the cube along the cameras forward, right and up vectors. The camera up vector is set to world up vector.
+
+### Notes
+You can change the texture only once, from the dirt texture to the gravel texture, but are unable to change it back to the dirt texture.  
+i had it working but i changed something and it broke and i didn't have time to fix it.  
+
+Both of the textures were created by me using an AI tool, theyre not the real microsoft textures.
+
+## Controls
+#### Camera
+- `ARROW__KEYS` - Move the camera.
+- `Mouse` - Look around.
+- `Left Shift` - Increase camera speed.
+- `Space` - Move the camera up.
+- `Left control` - Move the camera down.
+
+#### Cube Movement
+- `W` - Move the cube forward.
+- `S` - Move the cube backward.
+- `A` - Move the cube left.
+- `D` - Move the cube right.
+- `Q` - Move the cube up.
+- `E` - Move the cube down.
+
+#### View Mode Controls
+- `Tab` - Change between camera modes. (Auto Orbit -> Manual Orbit -> Free Cam -> Auto Orbit).
+- `CAPSLOCK` - Toggle between wireframe and fill mode.
+- `M` - Make cursor visible and print mouse coordinates to console.
+- `Left Click` - When mouse is visible, click on the ui square to change the textures of the cubes.
 
 ## Dependencies
 - [GLFW](https://www.glfw.org/) - For window creation and input handling
 - [GLEW](http://glew.sourceforge.net/) - For loading OpenGL functions
-
-## Installation
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/FosterSenpai/graphics-programming.git
-2. Create a build directory and navigate to it:
-    ```sh
-   mkdir build
-   cd build
-
-
-## Project Structure
-```
-' -- OpenGL Pipeline
-	|-- OpenGL Pipeline.sln
-	|-- README.md
-	|-- OpenGL Pipeline (Can't rename source pls help)
-	|   |-- main.cpp
-	|   |-- c_shader_loader.h
-	|   |-- c_shader_loader.cpp
-	|   |-- glew32.dll
-	|   |-- glfw3.dll
-	|
-	|-- Resources
-	|   |-- Shaders
-	|   |   |-- FixedColor.frag
-	|   |   |-- FixedTriangle.vert
-	|
-	|-- Dependencies
-	|   |-- GLEW
-	|   |-- GLFW
-```
-## Contributing
-Contributions are welcome! Please fork the repository and submit a pull request.
-
-## Acknowledgements
-- [GLFW](https://www.glfw.org/)
-- [GLEW](http://glew.sourceforge.net/)

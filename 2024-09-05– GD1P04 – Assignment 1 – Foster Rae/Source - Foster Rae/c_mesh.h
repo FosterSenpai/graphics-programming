@@ -9,11 +9,9 @@
 // Author : Foster Rae
 // Mail : Foster.Rae@mds.ac.nz
 // ************************************************************************/
-
 #pragma once
 #include <vector>
 #include <glew.h>
-#include <glm.hpp>
 #include "c_structs.h"
 
 class c_mesh
@@ -22,7 +20,7 @@ public:
 
 	// == Constructors and Destructors ==
 	c_mesh() = default; // Default constructor
-    c_mesh(const std::vector<s_vertex>& vertices, const std::vector<GLuint>& indices, const std::vector<s_texture>& textures);
+	c_mesh(const std::vector<s_vertex>& vertices, const std::vector<GLuint>& indices, const std::vector<s_texture>& textures);
 
 	// == Public Methods ==
 	/**
@@ -30,15 +28,16 @@ public:
 	 * @note Textures must be names as: texture_diffuseN, texture_specularN or nothing will be loaded.
 	 *
 	 * @param program_id The shader program to use.
+	 *  @param active_texture_index The index of the texture to use.
 	 */
-	void draw(GLuint program_id, int active_texture_index);
+	void draw(GLuint program_id, int active_texture_index) const;
 
 	// == Public Members ==
-	GLuint vao;
+	GLuint vao; // vao is public.
 	// Mesh data
-    std::vector<s_vertex> vertices;
-    std::vector<GLuint> indices;
-    std::vector<s_texture> textures;
+	std::vector<s_vertex> vertices;
+	std::vector<GLuint> indices;
+	std::vector<s_texture> textures;
 
 private:
 
@@ -48,9 +47,7 @@ private:
 	 * @note This is called in the constructor.
 	 */
 	void setup_mesh();
-	
-	// == Private Members ==
-	// VBO, VAO, EBO
-	GLuint vbo_, ebo_;
 
+	// == Private Members ==
+	GLuint vbo_, ebo_;
 };

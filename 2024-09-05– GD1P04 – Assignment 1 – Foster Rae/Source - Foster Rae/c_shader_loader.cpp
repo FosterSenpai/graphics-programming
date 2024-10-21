@@ -3,11 +3,9 @@
 #include<fstream>
 #include<vector>
 
-#include "c_camera.h"
-
 // == Constructors / Destructors ==
-c_shader_loader::c_shader_loader(void) = default;
-c_shader_loader::~c_shader_loader(void) = default;
+c_shader_loader::c_shader_loader() = default;
+c_shader_loader::~c_shader_loader() = default;
 
 // == Public Methods ==
 GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const char* fragment_shader_filename)
@@ -40,50 +38,6 @@ GLuint c_shader_loader::create_program(const char* vertex_shader_filename, const
 	return program; 				    // return the program ID.
 }
 
-void c_shader_loader::set_bool(GLuint program, const std::string& name, bool value)
-{
-	glUniform1i(glGetUniformLocation(program, name.c_str()), static_cast<int>(value));
-}
-void c_shader_loader::set_int(GLuint program, const std::string& name, int value)
-{
-	glUniform1i(glGetUniformLocation(program, name.c_str()), value);
-}
-void c_shader_loader::set_float(GLuint program, const std::string& name, float value)
-{
-	glUniform1f(glGetUniformLocation(program, name.c_str()), value);
-}
-void c_shader_loader::set_vec2(GLuint program, const std::string& name, const glm::vec2& value)
-{
-	glUniform2fv(glGetUniformLocation(program, name.c_str()), 1, &value[0]);
-}
-void c_shader_loader::set_vec2(GLuint program, const std::string& name, float x, float y)
-{
-	glUniform2f(glGetUniformLocation(program, name.c_str()), x, y); 
-}
-void c_shader_loader::set_vec3(GLuint program, const std::string& name, const glm::vec3& value)
-{
-	glUniform3fv(glGetUniformLocation(program, name.c_str()), 1, &value[0]);
-}
-void c_shader_loader::set_vec3(GLuint program, const std::string& name, float x, float y, float z)
-{
-	glUniform3f(glGetUniformLocation(program, name.c_str()), x, y, z);
-}
-void c_shader_loader::set_vec4(GLuint program, const std::string& name, const glm::vec4& value)
-{
-	glUniform4fv(glGetUniformLocation(program, name.c_str()), 1, &value[0]);
-}
-void c_shader_loader::set_vec4(GLuint program, const std::string& name, float x, float y, float z, float w)
-{
-	glUniform4f(glGetUniformLocation(program, name.c_str()), x, y, z, w);
-}
-void c_shader_loader::set_mat2(GLuint program, const std::string& name, const glm::mat2& mat)
-{
-	glUniformMatrix2fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
-}
-void c_shader_loader::set_mat_3(GLuint program, const std::string& name, const glm::mat3& mat)
-{
-	glUniformMatrix3fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
-}
 void c_shader_loader::set_mat_4(GLuint program, const std::string& name, const glm::mat4& mat)
 {
 	glUniformMatrix4fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
@@ -116,6 +70,7 @@ GLuint c_shader_loader::create_shader(GLenum shader_type, const char* shader_nam
 
 	return shader_id; // Return the GLuint ID of the compiled shader.
 }
+
 std::string c_shader_loader::read_shader_file(const char* filename)
 {
 	// Open the file and read the contents into a string.
@@ -138,6 +93,7 @@ std::string c_shader_loader::read_shader_file(const char* filename)
 	file.close(); 											// close the file.
 	return shader_code; 									// return the shader code.
 }
+
 void c_shader_loader::print_error_details(bool is_shader, GLuint id, const char* name)
 {
 	int info_log_length = 0;
@@ -147,7 +103,8 @@ void c_shader_loader::print_error_details(bool is_shader, GLuint id, const char*
 	std::vector<char> log(info_log_length);
 
 	// Retrieve the log info and populate log variable.
-	(is_shader == true) ? glGetShaderInfoLog(id, info_log_length, NULL, &log[0]) : glGetProgramInfoLog(id, info_log_length, NULL, &log[0]);
+	(is_shader == true) ? glGetShaderInfoLog(id, info_log_length, nullptr, log.data()) : glGetProgramInfoLog(id, info_log_length, nullptr,
+	                                                                                                  log.data());
 	std::cout << "Error compiling " << ((is_shader == true) ? "shader" : "program") << ": " << name << '\n';
-	std::cout << &log[0] << '\n';
+	std::cout << log.data() << '\n';
 }

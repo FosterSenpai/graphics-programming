@@ -9,13 +9,6 @@
 // Author : Foster Rae
 // Mail : Foster.Rae@mds.ac.nz
 // ************************************************************************/
-
-// TODO: Camera needs to move orbital around the origin
-// a & d should move the camera left and right,
-// w & s should move the camera closer and further away from the origin.
-// add ability to change between, automatic orbital movement and manual orbital movement and free movement.
-// use polar coordinates to move the camera around the origin.
-
 #pragma once
 #include <glfw3.h>
 #include <ext/matrix_float4x4.hpp>
@@ -26,7 +19,7 @@ class c_camera
 public:
 
 	// == Constructors and Destructors ==
-	c_camera(); // Constructor starts the camera at the origin.
+	c_camera(); // Constructs a new camera object looking at the origin 10 units back.
 	~c_camera() = default;
 
 	// == Public Methods ==
@@ -87,7 +80,7 @@ private:
 
 	// == Private Members ==
 	glm::vec3 position_;           // Position of the camera.
-	glm::vec3 previous_position_; 
+	glm::vec3 previous_position_;
 	glm::vec3 previous_free_position_;
 	glm::vec3 look_dir_;           // Direction the camera is looking. Normalized so also the camera's forward vector.
 	glm::vec3 right_vector_;
@@ -105,10 +98,10 @@ private:
 
 	// Mouse input variables.
 	double last_x_ = 400.0f;       // x position of the mouse, initialized to the center of the screen.
-    double last_y_ = 300.0f;       // y position of the mouse, initialized to the center of the screen.
-    float yaw_ = -90.0f;           // Yaw is initialized to -90.0 degrees to look along the z-axis
-    float pitch_ = 0.0f;
-    float sensitivity_ = 0.075f;   // Mouse sensitivity
+	double last_y_ = 300.0f;       // y position of the mouse, initialized to the center of the screen.
+	float yaw_ = -90.0f;           // Yaw is initialized to -90.0 degrees to look along the z-axis
+	float pitch_ = 0.0f;
+	float sensitivity_ = 0.075f;   // Mouse sensitivity
 	bool first_mouse_ = true;      // Flag to check if the mouse has moved. (Fix for mouse jump)
 
 	int window_width_ = 800;
@@ -118,5 +111,4 @@ private:
 	// Matrices
 	glm::mat4 view_matrix_;
 	glm::mat4 projection_matrix_;
-
 };

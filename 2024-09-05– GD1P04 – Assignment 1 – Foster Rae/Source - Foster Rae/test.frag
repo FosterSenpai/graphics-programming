@@ -18,6 +18,8 @@ uniform float time; // This isnt being used right now. Remember to use or remove
 void main()
 {
     vec4 color;
+
+    // Select the texture to use based on the active_texture uniform.
     if (active_texture == 0) {
         color = texture(texture_diffuse1, TexCoord);
     } else if (active_texture == 1) {
