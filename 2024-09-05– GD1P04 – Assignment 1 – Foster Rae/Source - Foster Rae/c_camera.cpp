@@ -4,6 +4,7 @@
 c_camera::c_camera()
 {
 	position_ = glm::vec3(0.0f, -2.0f, 10.0f); // Camera starts at 10 units back.
+	fov_ = 45.0f;
 	previous_position_ = position_;
 	previous_free_position_ = position_;
 	look_dir_ = glm::vec3(
@@ -54,7 +55,7 @@ void c_camera::update(GLFWwindow* window, float delta_time)
 	right_vector_ = glm::normalize(glm::cross(look_dir_, up_dir_));
 
 	// Update the perspective matrix.
-	projection_matrix_ = glm::perspective(glm::radians(45.0f), static_cast<float>(window_width_) / static_cast<float>(window_height_), 0.1f, view_distance_);
+	projection_matrix_ = glm::perspective(glm::radians(fov_), static_cast<float>(window_width_) / static_cast<float>(window_height_), 0.1f, view_distance_);
 
 	// Update the current time.
 	current_time += delta_time;
@@ -71,15 +72,15 @@ void c_camera::process_input(GLFWwindow* window, float delta_time)
 	}
 	else if (is_manual_camera_) // Manual Orbit.
 	{
-		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // Move left.
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // Move left.
 		{
 			orbit_angle_ += get_camera_speed() * delta_time * orbit_multiplier;
 		}
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) // Move right.
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // Move right.
 		{
 			orbit_angle_ -= get_camera_speed() * delta_time * orbit_multiplier;
 		}
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) // Move closer.
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // Move closer.
 		{
 			orbit_radius_ -= get_camera_speed() * delta_time * orbit_multiplier / 5; // Was a bit too fast so divide by 5.
 			if (orbit_radius_ < 1.0f) // Prevent the camera from getting too close.
@@ -87,7 +88,7 @@ void c_camera::process_input(GLFWwindow* window, float delta_time)
 				orbit_radius_ = 1.0f;
 			}
 		}
-		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // Move further.
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // Move further.
 		{
 			orbit_radius_ += get_camera_speed() * delta_time * orbit_multiplier / 5;
 		}
@@ -99,27 +100,27 @@ void c_camera::process_input(GLFWwindow* window, float delta_time)
 		glfwGetCursorPos(window, &x_pos, &y_pos);
 		mouse_input(window, x_pos, y_pos);
 
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) // Move forward.
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) // Move forward.
 		{
 			direction += look_dir_;
 		}
-		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // Move backward.
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // Move backward.
 		{
 			direction -= look_dir_;
 		}
-		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // Move left.
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // Move left.
 		{
 			direction -= glm::normalize(glm::cross(look_dir_, up_dir_));
 		}
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) // Move right.
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) // Move right.
 		{
 			direction += glm::normalize(glm::cross(look_dir_, up_dir_));
 		}
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) // Move up.
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) // Move up.
 		{
 			direction += up_dir_;
 		}
-		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) // Move down.
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) // Move down.
 		{
 			direction -= up_dir_;
 		}
@@ -221,4 +222,11 @@ void c_camera::switch_camera_mode()
 		previous_free_position_ = position_; // Save old free cam pos for changing back.
 		is_target_camera_ = true;            // Switch to auto orbit.
 	}
+}
+
+void c_camera::zoom(double y_offset)
+{
+    fov_ -= static_cast<float>(y_offset);
+    if (fov_ < 10.0f) fov_ = 10.0f;   // Clamp FOV to a minimum value.
+    if (fov_ > 75.0f) fov_ = 75.0f; // Clamp FOV to a maximum value.
 }

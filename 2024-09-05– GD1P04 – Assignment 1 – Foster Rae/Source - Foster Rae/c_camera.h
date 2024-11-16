@@ -47,6 +47,11 @@ public:
 	 * @brief Switches the camera mode between FPS and target camera.
 	 */
 	void switch_camera_mode();
+	/**
+     * @brief Adjusts the FOV based on scroll input.
+     * @param y_offset The scroll offset.
+     */
+    void zoom(double y_offset);
 
 	// == Accessors & Mutators ==
 	void set_position(glm::vec3 position) { position_ = position; }											   // Set the position of the camera.
@@ -88,6 +93,7 @@ private:
 	glm::vec3 target_position_;    // Position of the target camera.
 	float last_tab_time_;          // Time since the last tab press.
 	float camera_speed_ = 2.5f;    // Speed the camera moves at.
+	float fov_;
 
 	// Orbit variables.
 	bool is_target_camera_; // Automatic orbit flag.

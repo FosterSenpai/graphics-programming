@@ -40,10 +40,14 @@ GLfloat current_time;
 GLfloat previous_time = 0.0f;
 GLfloat delta_time;
 
-// Link the mouse callback to the camera mouse input function.
+// Callback functions.
 void mouse_callback(GLFWwindow* glfw_window, double x_pos, double y_pos)
 {
 	camera.mouse_input(window, x_pos, y_pos);
+}
+void scroll_callback(GLFWwindow* window, double x_offset, double y_offset)
+{
+    camera.zoom(y_offset);
 }
 
 // == Function Prototypes ==
@@ -112,6 +116,8 @@ void initial_setup()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+	// Enable MSAA.
+    glEnable(GL_MULTISAMPLE);
 
 	// Flip images vertically.
 	stbi_set_flip_vertically_on_load(true);
@@ -121,7 +127,9 @@ void initial_setup()
 	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 	// Set the mouse callback function.
-	glfwSetCursorPosCallback(window, mouse_callback); // Look I found a reason to use the mouse pos callback.
+	glfwSetCursorPosCallback(window, mouse_callback);
+	// Set the scroll callback function.
+    glfwSetScrollCallback(window, scroll_callback);
 
 	// Create the shader program.
 	shader_program = c_shader_loader::create_program("test.vert", "test.frag");
@@ -382,29 +390,21 @@ void process_input(void* glfw_window)
 		if (cube->get_active_cube())
 		{
 			// Move the cube.
-			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 			{
 				cube->move(camera, glm::vec3(0.0f, 0.0f, 1.0f));
 			}
-			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 			{
 				cube->move(camera, glm::vec3(0.0f, 0.0f, -1.0f));
 			}
-			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 			{
 				cube->move(camera, glm::vec3(-1.0f, 0.0f, 0.0f));
 			}
-			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 			{
 				cube->move(camera, glm::vec3(1.0f, 0.0f, 0.0f));
-			}
-			if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-			{
-				cube->move(camera, glm::vec3(0.0f, -1.0f, 0.0f));
-			}
-			if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-			{
-				cube->move(camera, glm::vec3(0.0f, 1.0f, 0.0f));
 			}
 		}
 	}
