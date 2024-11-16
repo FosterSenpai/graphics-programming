@@ -50,6 +50,12 @@
     <ClInclude Include="c_cube.h">
       <Filter>Header Files\Shapes</Filter>
     </ClInclude>
+    <ClInclude Include="c_light_manager.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="c_sky_box.h">
+      <Filter>Header Files\Shapes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="image_loader.cpp">
@@ -73,10 +79,18 @@
     <ClCompile Include="c_cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="c_light_manager.cpp">
+      <Filter>Source Files\Class Implementations\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="c_sky_box.cpp">
+      <Filter>Source Files\Class Implementations\Shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
     <None Include="test.frag" />
     <None Include="test.vert" />
+    <None Include="skybox.vert" />
+    <None Include="skybox.frag" />
   </ItemGroup>
 </Project>

@@ -15,6 +15,8 @@ Mail : Foster.Rae@mds.ac.nz
 #include "c_structs.h"
 #include "c_camera.h"
 #include "c_cube.h"
+#include "c_light_manager.h"
+#include "c_sky_box.h"
 
 // == Global Variables ==
 GLFWwindow* window;
@@ -39,6 +41,9 @@ size_t active_texture_index = 0;   // Index of the active texture.
 GLfloat current_time;
 GLfloat previous_time = 0.0f;
 GLfloat delta_time;
+
+c_light_manager light_manager;
+Skybox* skybox;
 
 // Callback functions.
 void mouse_callback(GLFWwindow* glfw_window, double x_pos, double y_pos)
@@ -100,6 +105,7 @@ int main()
 	{
 		delete cube;
 	}
+	delete skybox;
 
 	return 0;
 }
@@ -109,6 +115,18 @@ void initial_setup()
 	// Set Blending.
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Set to general blend.
+
+	std::vector<std::string> faces = {
+	    "Resources/Textures/right.png",
+	    "Resources/Textures/left.png",
+	    "Resources/Textures/top.png",
+	    "Resources/Textures/bottom.png",
+	    "Resources/Textures/front.png",
+	    "Resources/Textures/back.png"
+	};
+
+    skybox = new Skybox(faces);
+
 	// Enable depth testing.
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -191,13 +209,31 @@ void initial_setup()
 	// Position the UI cube within the orthographic projection.
 	ui_cube_position = glm::vec3(window_width - 100.0f, window_height - 100.0f, 0.0f);
 	ui_cube_scale = glm::vec3(150.0f, 150.0f, 1.0f);
-
 	ui_cube = new c_cube(textures, ui_cube_position, 0.0f, ui_cube_scale);
+
+    // === SETUP LIGHTS HERE ===
+    // Set main directional light
+    s_directional_light main_dir_light = { glm::normalize(glm::vec3(-1.5f, -2.0f, -1.0f)), glm::vec3(0.8f, 0.8f, 0.8f) };
+    light_manager.set_directional_light(main_dir_light);
+
+    // Add a couple of point lights
+    s_point_light point_light1 = { glm::vec3(2.0f, 5.0f, 2.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.09f, 0.032f };
+    light_manager.add_point_light(point_light1);
+
+    s_point_light point_light2 = { glm::vec3(-2.0f, 5.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.09f, 0.032f };
+    light_manager.add_point_light(point_light2);
+
+    // Set spotlight
+    s_spotlight spot_light = { glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, -1.0f, -1.0f),
+        glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)),
+        glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f };
+    light_manager.set_spotlight(spot_light);
 
 	// Prepare the window.
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
 	glViewport(0, 0, camera.get_window_width(), camera.get_window_height()); // Maps the range of the window size to NDC space.
 }
+
 void update()
 {
 	// Update Time.
@@ -284,8 +320,16 @@ void render()
 	glUniform1f(glGetUniformLocation(shader_program, "time"), current_time);
 	// ========== START OF RENDERING PIPELINE ==========
 
+	// Draw the skybox.
+    glDepthFunc(GL_LEQUAL);  // Change depth function so skybox is rendered in the background.
+    skybox->draw(camera.get_view_matrix(), camera.get_projection_matrix());
+    glDepthFunc(GL_LESS);  // Reset depth function to default.
+
 	// Use the shader program.
 	glUseProgram(shader_program);
+
+	// Update lights in shader
+    light_manager.update_lights_in_shader(shader_program);
 
 	// Pass camera matrices to the shader.
 	c_shader_loader::set_mat_4(shader_program, "projection", camera.get_projection_matrix());
@@ -300,6 +344,7 @@ void render()
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+
 
 	// == DRAW OBJECTS HERE ==;
 
@@ -408,4 +453,45 @@ void process_input(void* glfw_window)
 			}
 		}
 	}
+    // Toggle point lights
+    static bool point_lights_toggle = false;
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !point_lights_toggle)
+    {
+        static bool point_lights_state = true;
+        light_manager.toggle_point_lights(point_lights_state);
+        point_lights_state = !point_lights_state;
+        point_lights_toggle = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE)
+    {
+        point_lights_toggle = false;
+    }
+
+    // Toggle directional light
+    static bool dir_light_toggle = false;
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !dir_light_toggle)
+    {
+        static bool dir_light_state = true;
+        light_manager.toggle_directional_light(dir_light_state);
+        dir_light_state = !dir_light_state;
+        dir_light_toggle = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE)
+    {
+        dir_light_toggle = false;
+    }
+
+    // Toggle spotlight
+    static bool spot_light_toggle = false;
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !spot_light_toggle)
+    {
+        static bool spot_light_state = true;
+        light_manager.toggle_spotlight(spot_light_state);
+        spot_light_state = !spot_light_state;
+        spot_light_toggle = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE)
+    {
+        spot_light_toggle = false;
+    }
 }

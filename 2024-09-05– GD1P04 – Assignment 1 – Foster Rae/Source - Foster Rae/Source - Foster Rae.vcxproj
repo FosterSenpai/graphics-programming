@@ -141,21 +141,27 @@
     <ClInclude Include="c_camera.h" />
     <ClInclude Include="c_cube.h" />
     <ClInclude Include="c_graphics_utils.h" />
+    <ClInclude Include="c_light_manager.h" />
     <ClInclude Include="c_mesh.h" />
     <ClInclude Include="c_shader_loader.h" />
+    <ClInclude Include="c_sky_box.h" />
     <ClInclude Include="c_structs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="c_camera.cpp" />
     <ClCompile Include="c_cube.cpp" />
     <ClCompile Include="c_graphics_utils.cpp" />
+    <ClCompile Include="c_light_manager.cpp" />
     <ClCompile Include="c_mesh.cpp" />
     <ClCompile Include="c_shader_loader.cpp" />
+    <ClCompile Include="c_sky_box.cpp" />
     <ClCompile Include="image_loader.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="skybox.frag" />
+    <None Include="skybox.vert" />
     <None Include="test.frag" />
     <None Include="test.vert" />
   </ItemGroup>
