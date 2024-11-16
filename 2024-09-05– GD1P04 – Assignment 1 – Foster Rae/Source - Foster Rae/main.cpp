@@ -116,6 +116,7 @@ void initial_setup()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Set to general blend.
 
+	// Set up skybox.
 	std::vector<std::string> faces = {
 	    "Resources/Textures/right.png",
 	    "Resources/Textures/left.png",
@@ -124,7 +125,6 @@ void initial_setup()
 	    "Resources/Textures/front.png",
 	    "Resources/Textures/back.png"
 	};
-
     skybox = new Skybox(faces);
 
 	// Enable depth testing.
@@ -212,19 +212,19 @@ void initial_setup()
 	ui_cube = new c_cube(textures, ui_cube_position, 0.0f, ui_cube_scale);
 
     // === SETUP LIGHTS HERE ===
-    // Set main directional light
+    // Main directional light.
     s_directional_light main_dir_light = { glm::normalize(glm::vec3(-1.5f, -2.0f, -1.0f)), glm::vec3(0.8f, 0.8f, 0.8f) };
     light_manager.set_directional_light(main_dir_light);
 
-    // Add a couple of point lights
-    s_point_light point_light1 = { glm::vec3(2.0f, 5.0f, 2.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.09f, 0.032f };
+    // Point lights.
+    s_point_light point_light1 = { glm::vec3(6.0f, 5.0f, -7.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.09f, 0.032f };
     light_manager.add_point_light(point_light1);
 
-    s_point_light point_light2 = { glm::vec3(-2.0f, 5.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.09f, 0.032f };
+    s_point_light point_light2 = { glm::vec3(1.0f, 5.0f, -10.0f), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.09f, 0.032f };
     light_manager.add_point_light(point_light2);
 
-    // Set spotlight
-    s_spotlight spot_light = { glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, -1.0f, -1.0f),
+    // Spotlight.
+    s_spotlight spot_light = { glm::vec3(0.0f, 0.0f, 0.0f), camera.get_look_dir(),
         glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)),
         glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f };
     light_manager.set_spotlight(spot_light);
@@ -259,6 +259,9 @@ void update()
 		// Print the mouse position if the cursor is visible.
 		std::cout << "Mouse Position: " << x_pos << ", " << y_pos << '\n';
 	}
+
+	// Update spotlight position and direction based on camera.
+    light_manager.update_spotlight(camera.get_position(), camera.get_look_dir());
 
 	// TODO: fix changing back to first texture on second click.
 	// UI cube bounds.
@@ -321,9 +324,7 @@ void render()
 	// ========== START OF RENDERING PIPELINE ==========
 
 	// Draw the skybox.
-    glDepthFunc(GL_LEQUAL);  // Change depth function so skybox is rendered in the background.
     skybox->draw(camera.get_view_matrix(), camera.get_projection_matrix());
-    glDepthFunc(GL_LESS);  // Reset depth function to default.
 
 	// Use the shader program.
 	glUseProgram(shader_program);

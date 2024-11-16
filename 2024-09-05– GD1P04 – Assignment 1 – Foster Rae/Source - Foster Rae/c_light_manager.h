@@ -14,6 +14,14 @@
 #include <vector>
 
 // === LIGHT STRUCTS ===
+/**
+ * @brief Struct to hold the point light data.
+ * @param position The position of the light. (vec3)
+ * @param color The color of the light. (vec3)
+ * @param constant The constant attenuation value. (float)
+ * @param linear The linear attenuation value. (float)
+ * @param quadratic The quadratic attenuation value. (float)
+ */
 struct s_point_light {
     glm::vec3 position;
     glm::vec3 color;
@@ -23,11 +31,27 @@ struct s_point_light {
     float quadratic;
 };
 
+/**
+ * @brief Struct to hold the directional light data.
+ * @param direction The direction of the light. (vec3)
+ * @param color The color of the light. (vec3)
+ */
 struct s_directional_light {
     glm::vec3 direction;
     glm::vec3 color;
 };
 
+/**
+ * @brief Struct to hold the spotlight data.
+ * @param position The position of the light. (vec3)
+ * @param direction The direction of the light. (vec3)
+ * @param cut_off The cut off value. (float)
+ * @param outer_cut_off The outer cut off value. (float)
+ * @param color The color of the light. (vec3)
+ * @param constant The constant attenuation value. (float)
+ * @param linear The linear attenuation value. (float)
+ * @param quadratic The quadratic attenuation value. (float)
+ */
 struct s_spotlight {
     glm::vec3 position;
     glm::vec3 direction;
@@ -80,6 +104,7 @@ public:
      * @param shader_program The shader program to update the lights in.
      */
     void update_lights_in_shader(unsigned int shader_program);
+    void update_spotlight(const glm::vec3& position, const glm::vec3& direction);
 
 private:
 

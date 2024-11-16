@@ -61,3 +61,10 @@ void c_light_manager::update_lights_in_shader(unsigned int shader_program) {
     glUniform1i(glGetUniformLocation(shader_program, "dirLightOn"), dir_light_on_);
     glUniform1i(glGetUniformLocation(shader_program, "spotLightOn"), spot_light_on_);
 }
+
+void c_light_manager::update_spotlight(const glm::vec3& position, const glm::vec3& direction)
+{
+    // Update with parameters.
+	spot_light_.position = position;
+	spot_light_.direction = direction;
+}
