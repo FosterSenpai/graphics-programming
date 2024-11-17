@@ -42,6 +42,7 @@ public:
 	 * @param mat The matrix to pass to the shader.
 	 */
 	static void set_mat_4(GLuint program, const std::string& name, const glm::mat4& mat);
+	static void set_vec_3(GLuint shader_program, const std::string& name, const glm::vec3& value);
 
 private:
 

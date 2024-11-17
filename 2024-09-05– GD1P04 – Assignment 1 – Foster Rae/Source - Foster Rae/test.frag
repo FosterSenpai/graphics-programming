@@ -16,6 +16,7 @@ uniform sampler2D texture_specular2;
 uniform sampler2D texture_specular3;
 uniform int active_texture; // Uniform to select which texture to use.
 uniform float time; // This isnt being used right now. Remember to use or remove.
+uniform vec3 cubeColor;
 
 // Lighting structs.
 struct PointLight {
@@ -73,6 +74,9 @@ void main()
     } else {
         color = vec4(1.0, 0.0, 1.0, 1.0); // Default to magenta if no valid texture is selected.
     }
+
+    // Use the cube color
+    color.rgb *= cubeColor;
 
     // Ambient lighting.
     vec3 ambient = 0.1 * color.rgb;

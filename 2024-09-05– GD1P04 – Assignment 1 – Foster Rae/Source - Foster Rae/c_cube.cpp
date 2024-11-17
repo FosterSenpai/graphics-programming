@@ -50,17 +50,20 @@ c_cube::c_cube(const std::vector<s_texture>& textures, glm::vec3 pos, float rot,
             20, 21, 23, // Bottom face
             21, 22, 23
         },
-        textures)), position_(pos), rotation_(rot), scale_(scl)
+        textures)), position_(pos), rotation_(rot), scale_(scl), color_(glm::vec3(1.0f))
 {}
 
 void c_cube::draw(GLuint shader_program, int active_texture_index)
 {
-	// Update and set the model matrix.
-	update_model_matrix();
-	c_shader_loader::set_mat_4(shader_program, "transform", model_matrix_);
+    // Update and set the model matrix.
+    update_model_matrix();
+    c_shader_loader::set_mat_4(shader_program, "transform", model_matrix_);
 
-	// Draw the cube.
-	mesh_.draw(shader_program, active_texture_index);
+    // Set the color uniform.
+    c_shader_loader::set_vec_3(shader_program, "cubeColor", color_);
+
+    // Draw the cube.
+    mesh_.draw(shader_program, active_texture_index);
 }
 
 void c_cube::update_model_matrix()
@@ -93,11 +96,4 @@ void c_cube::move(const c_camera& camera, const glm::vec3& direction)
 			position_ += scaled_direction.x * right + scaled_direction.y * camera.get_up_dir() + scaled_direction.z * camera.get_look_dir();
 		}
 	}
-}
-
-void c_cube::set_color(const glm::vec3& color) {
-    for (auto& vertex : mesh_.vertices) {
-        vertex.color = color; // Assuming s_vertex has a color attribute.
-    }
-    mesh_.setup_mesh(); // Re-setup the mesh to update the color.
 }

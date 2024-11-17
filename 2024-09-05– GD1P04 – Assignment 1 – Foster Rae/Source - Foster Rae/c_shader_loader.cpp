@@ -43,6 +43,11 @@ void c_shader_loader::set_mat_4(GLuint program, const std::string& name, const g
 	glUniformMatrix4fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
+void c_shader_loader::set_vec_3(GLuint shader_program, const std::string& name, const glm::vec3& value)
+{
+    glUniform3fv(glGetUniformLocation(shader_program, name.c_str()), 1, &value[0]);
+}
+
 // == Private Methods ==
 GLuint c_shader_loader::create_shader(GLenum shader_type, const char* shader_name)
 {

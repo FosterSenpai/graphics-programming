@@ -52,7 +52,7 @@ public:
 	void set_scale(glm::vec3 scl) { scale_ = scl; } 			    // Set the scale of the cube.
 	void set_active_cube(bool active) { is_active_cube_ = active; } // Set the cube to be controlled by the user.
 	void set_speed(float speed) { speed_ = speed; }                 // Set the movement speed of the cube.
-	void set_color(const glm::vec3& color);                                // Set the color of the cube.
+	void set_color(const glm::vec3& color) { color_ = color; }
 
 	glm::vec3 get_position() const { return position_; }
 	float get_rotation() const { return rotation_; }
@@ -69,4 +69,5 @@ private:
 	glm::mat4 model_matrix_ = glm::mat4(1.0f);
 	bool is_active_cube_ = false; // Flag to determine if the cube is the cube being controlled by the user.
 	float speed_ = 0.1f; 		  // The speed the cube moves at.
+	glm::vec3 color_;
 };

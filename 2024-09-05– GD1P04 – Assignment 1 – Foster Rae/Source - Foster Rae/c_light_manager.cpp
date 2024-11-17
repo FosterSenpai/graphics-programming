@@ -9,6 +9,12 @@ c_light_manager::c_light_manager()
 
 void c_light_manager::add_point_light(const s_point_light& light) {
     point_lights_.push_back(light);
+
+    // Create a cube for the point light and set its initial color.
+    std::vector<s_texture> textures;
+    c_cube light_cube(textures, light.position, 0.0f, glm::vec3(0.1f));
+    light_cube.set_color(light.color);
+    point_light_cubes_.push_back(light_cube);
 }
 
 void c_light_manager::set_directional_light(const s_directional_light& light) {
@@ -31,7 +37,7 @@ void c_light_manager::toggle_spotlight(bool state) {
     spot_light_on_ = state;
 }
 
-void c_light_manager::update_lights_in_shader(unsigned int shader_program) {
+void c_light_manager::update_lights_in_shader(unsigned int shader_program, const glm::vec3& camera_position) {
     glUseProgram(shader_program);
 
     // Update point lights.
@@ -58,6 +64,9 @@ void c_light_manager::update_lights_in_shader(unsigned int shader_program) {
     glUniform1f(glGetUniformLocation(shader_program, "spotLight.linear"), spot_light_.linear);
     glUniform1f(glGetUniformLocation(shader_program, "spotLight.quadratic"), spot_light_.quadratic);
 
+    // Update camera position for specular highlights.
+    glUniform3fv(glGetUniformLocation(shader_program, "viewPos"), 1, &camera_position[0]);
+
     // Update light toggles.
     glUniform1i(glGetUniformLocation(shader_program, "pointLightsOn"), point_lights_on_);
     glUniform1i(glGetUniformLocation(shader_program, "dirLightOn"), dir_light_on_);
@@ -69,4 +78,22 @@ void c_light_manager::update_spotlight(const glm::vec3& position, const glm::vec
     // Update with parameters.
 	spot_light_.position = position;
 	spot_light_.direction = direction;
+}
+
+void c_light_manager::update_point_light_cubes()
+{
+    for (size_t i = 0; i < point_lights_.size(); ++i) {
+    	c_cube& light_cube = point_light_cubes_[i];
+	    const s_point_light& point_light = point_lights_[i];
+
+	    // Set the color of the cube to match the point light color.
+	    light_cube.set_color(point_light.color);
+    }
+}
+
+void c_light_manager::draw_point_light_cubes(GLuint shader_program)
+{
+    for (c_cube& light_cube : point_light_cubes_) {
+		light_cube.draw(shader_program, 0);
+    }
 }

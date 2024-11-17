@@ -9,31 +9,31 @@ I didn't have time to implement the model loading properly so I just used a cube
 
 Can change between different camera modes, wireframe and fill mode, and change the textures of the cubes by clicking on the ui square.
 
-Camera movement is done with the `Arrow Keys`.
-
-Cube Movement is done by using `WASD` to move the cube along the cameras forward, right and up vectors. The camera up vector is set to world up vector.
-
 ### Notes
 You can change the texture only once, from the dirt texture to the gravel texture, but are unable to change it back to the dirt texture.  
 i had it working but i changed something and it broke and i didn't have time to fix it.  
 
 Both of the textures were created by me using an AI tool, theyre not the real microsoft textures.
 
+Skybox textures from [here](https://vladislavzh.net/notes/retro-skyboxes-released).
+
 ## Controls
+
+#### Lights
+- `1` - Toggle directional light.
+- `2` - Toggle point light.
+- `3` - Toggle spot light.
+
 #### Camera
-- `ARROW__KEYS` - Move the camera.
+- `WASD` - Move the camera.
 - `Mouse` - Look around.
+- `Scroll Wheel` - Zoom in and out.
 - `Left Shift` - Increase camera speed.
-- `Space` - Move the camera up.
-- `Left control` - Move the camera down.
+- `Q` - Move the camera up.
+- `E` - Move the camera down.
 
 #### Cube Movement
-- `W` - Move the cube forward.
-- `S` - Move the cube backward.
-- `A` - Move the cube left.
-- `D` - Move the cube right.
-- `Q` - Move the cube up.
-- `E` - Move the cube down.
+- `ARROW KEYS` - Move the cube.
 
 #### View Mode Controls
 - `Tab` - Change between camera modes. (Auto Orbit -> Manual Orbit -> Free Cam -> Auto Orbit).

@@ -10,8 +10,11 @@
 // Mail : Foster.Rae@mds.ac.nz
 // ************************************************************************/
 #pragma once
+#include <glew.h>
 #include <glm.hpp>
 #include <vector>
+
+#include "c_cube.h"
 
 // === LIGHT STRUCTS ===
 /**
@@ -102,8 +105,9 @@ public:
     /**
      * @brief Update the lights in the shader.
      * @param shader_program The shader program to update the lights in.
+     * @param camera_position The position of the camera, to calculate specular highlights.
      */
-    void update_lights_in_shader(unsigned int shader_program);
+    void update_lights_in_shader(unsigned int shader_program, const glm::vec3& camera_position);
     /**
      * @brief Update the spotlight with camera position and direction.
      * @param position The position of the camera.
@@ -115,10 +119,20 @@ public:
 	 * @return A vector of point lights.
 	 */
     const std::vector<s_point_light>& get_point_lights() const { return point_lights_; }
+    /**
+     * @brief Update the point light cubes to match the point light positions and colors.
+     */
+    void update_point_light_cubes();
+    /**
+	 * @brief Draw the point light cubes.
+	 * @param shader_program The shader program to draw the cubes with.
+	 */
+    void draw_point_light_cubes(GLuint shader_program);
 
 private:
 
     std::vector<s_point_light> point_lights_; // Vector of point lights in the scene.
+    std::vector<c_cube> point_light_cubes_;   // Vector of cubes representing the point lights.
     s_directional_light dir_light_;
     s_spotlight spot_light_;
     // Light toggles.

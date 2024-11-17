@@ -213,14 +213,14 @@ void initial_setup()
 
     // === SETUP LIGHTS HERE ===
     // Main directional light.
-    s_directional_light main_dir_light = { glm::normalize(glm::vec3(-1.5f, -2.0f, -1.0f)), glm::vec3(0.8f, 0.8f, 0.8f) };
+    s_directional_light main_dir_light = { glm::normalize(glm::vec3(-20.5f, -20.0f, 15.0f)), glm::vec3(0.8f, 0.8f, 0.8f) };
     light_manager.set_directional_light(main_dir_light);
 
     // Point lights.
-    s_point_light point_light1 = { glm::vec3(6.0f, 5.0f, -7.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.09f, 0.032f };
+    s_point_light point_light1 = { glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.09f, 0.032f };
     light_manager.add_point_light(point_light1);
 
-    s_point_light point_light2 = { glm::vec3(1.0f, 5.0f, -10.0f), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.09f, 0.032f };
+    s_point_light point_light2 = { glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.09f, 0.032f };
     light_manager.add_point_light(point_light2);
 
     // Spotlight.
@@ -228,15 +228,6 @@ void initial_setup()
         glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)),
         glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f };
     light_manager.set_spotlight(spot_light);
-
-	// Create cubes for point lights.
-    const auto& point_lights = light_manager.get_point_lights();
-    for (const auto& light : point_lights) {
-        std::vector<s_texture> empty_textures; // Empty textures for the light cubes.
-        c_cube* light_cube = new c_cube(empty_textures, light.position, 0.0f, glm::vec3(0.1f)); // Small cube for light representation.
-        light_cube->set_color(light.color); // Set the color of the cube to match the light color.
-        cubes.push_back(light_cube);
-    }
 
 	// Prepare the window.
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -339,7 +330,7 @@ void render()
 	glUseProgram(shader_program);
 
 	// Update lights in shader
-    light_manager.update_lights_in_shader(shader_program);
+    light_manager.update_lights_in_shader(shader_program, camera.get_position());
 
 	// Pass camera matrices to the shader.
 	c_shader_loader::set_mat_4(shader_program, "projection", camera.get_projection_matrix());
@@ -363,6 +354,9 @@ void render()
 	{
 		cube->draw(shader_program, static_cast<int>(active_texture_index));
 	}
+
+	// Draw the point light cubes.
+	light_manager.draw_point_light_cubes(shader_program);
 
 	// Disable depth testing for UI rendering.
 	glDisable(GL_DEPTH_TEST);
