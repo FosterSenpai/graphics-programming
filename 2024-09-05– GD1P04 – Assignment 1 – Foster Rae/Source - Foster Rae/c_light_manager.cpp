@@ -3,7 +3,9 @@
 #include <string>
 
 c_light_manager::c_light_manager()
-    : point_lights_on_(true), dir_light_on_(true), spot_light_on_(true) {}
+	: dir_light_(), spot_light_(), point_lights_on_(true), dir_light_on_(true), spot_light_on_(true)
+{
+}
 
 void c_light_manager::add_point_light(const s_point_light& light) {
     point_lights_.push_back(light);

@@ -94,3 +94,10 @@ void c_cube::move(const c_camera& camera, const glm::vec3& direction)
 		}
 	}
 }
+
+void c_cube::set_color(const glm::vec3& color) {
+    for (auto& vertex : mesh_.vertices) {
+        vertex.color = color; // Assuming s_vertex has a color attribute.
+    }
+    mesh_.setup_mesh(); // Re-setup the mesh to update the color.
+}

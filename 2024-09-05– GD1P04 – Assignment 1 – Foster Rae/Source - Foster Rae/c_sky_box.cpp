@@ -3,9 +3,9 @@
 #include <stb_image.h>
 #include <iostream>
 
-// Skybox vertices
+// Skybox vertices.
 float skyboxVertices[] = {
-    // positions
+    // positions.
     -1.0f,  1.0f, -1.0f,
     -1.0f, -1.0f, -1.0f,
      1.0f, -1.0f, -1.0f,
@@ -49,19 +49,19 @@ float skyboxVertices[] = {
      1.0f, -1.0f,  1.0f
 };
 
-Skybox::Skybox(const std::vector<std::string>& faces) {
-    setupSkybox();
-    loadCubemap(faces);
-    shaderProgram = c_shader_loader::create_program("skybox.vert", "skybox.frag");
+c_skybox::c_skybox(const std::vector<std::string>& faces) {
+    setup_skybox();
+    load_cubemap(faces);
+    shader_program_ = c_shader_loader::create_program("skybox.vert", "skybox.frag");
 }
 
-void Skybox::setupSkybox() {
+void c_skybox::setup_skybox() {
     // Generate the VAO and VBO for the skybox.
-    glGenVertexArrays(1, &skyboxVAO);
-    glGenBuffers(1, &skyboxVBO);
+    glGenVertexArrays(1, &skybox_vao_);
+    glGenBuffers(1, &skybox_vbo_);
     // Bind the VAO and VBO.
-    glBindVertexArray(skyboxVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBindVertexArray(skybox_vao_);
+    glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo_);
 
     // Vertex data.
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
@@ -70,10 +70,10 @@ void Skybox::setupSkybox() {
     glBindVertexArray(0);
 }
 
-void Skybox::loadCubemap(const std::vector<std::string>& faces) {
+void c_skybox::load_cubemap(const std::vector<std::string>& faces) {
     // Generate the cubemap texture.
-    glGenTextures(1, &cubemapTexture);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glGenTextures(1, &cubemap_texture_);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture_);
     // Load the faces of the cubemap.
     int width, height, nrChannels;
     for (unsigned int i = 0; i < faces.size(); i++) {
@@ -88,29 +88,29 @@ void Skybox::loadCubemap(const std::vector<std::string>& faces) {
         }
     }
 
-    // Set texture parameters
+    // Set texture parameters.
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    // Generate mipmaps
+    // Generate mipmaps.
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
-void Skybox::draw(const glm::mat4& view, const glm::mat4& projection) {
+void c_skybox::draw(const glm::mat4& view, const glm::mat4& projection) {
     glDepthFunc(GL_LEQUAL);  // Change depth function so skybox is drawn in the background.
-    glUseProgram(shaderProgram);
+    glUseProgram(shader_program_);
 
     // Remove translation from the view matrix.
     glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(view));
-    c_shader_loader::set_mat_4(shaderProgram, "view", viewNoTranslation);
-    c_shader_loader::set_mat_4(shaderProgram, "projection", projection);
+    c_shader_loader::set_mat_4(shader_program_, "view", viewNoTranslation);
+    c_shader_loader::set_mat_4(shader_program_, "projection", projection);
 
     // Bind VAO and draw.
-    glBindVertexArray(skyboxVAO);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glBindVertexArray(skybox_vao_);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture_);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glUseProgram(0);

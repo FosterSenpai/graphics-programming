@@ -43,14 +43,14 @@ GLfloat previous_time = 0.0f;
 GLfloat delta_time;
 
 c_light_manager light_manager;
-Skybox* skybox;
+c_skybox* skybox;
 
 // Callback functions.
 void mouse_callback(GLFWwindow* glfw_window, double x_pos, double y_pos)
 {
 	camera.mouse_input(window, x_pos, y_pos);
 }
-void scroll_callback(GLFWwindow* window, double x_offset, double y_offset)
+void scroll_callback(GLFWwindow* glfw_window, double x_offset, double y_offset)
 {
     camera.zoom(y_offset);
 }
@@ -125,7 +125,7 @@ void initial_setup()
 	    "Resources/Textures/front.png",
 	    "Resources/Textures/back.png"
 	};
-    skybox = new Skybox(faces);
+    skybox = new c_skybox(faces);
 
 	// Enable depth testing.
 	glEnable(GL_DEPTH_TEST);
@@ -228,6 +228,15 @@ void initial_setup()
         glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)),
         glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f };
     light_manager.set_spotlight(spot_light);
+
+	// Create cubes for point lights.
+    const auto& point_lights = light_manager.get_point_lights();
+    for (const auto& light : point_lights) {
+        std::vector<s_texture> empty_textures; // Empty textures for the light cubes.
+        c_cube* light_cube = new c_cube(empty_textures, light.position, 0.0f, glm::vec3(0.1f)); // Small cube for light representation.
+        light_cube->set_color(light.color); // Set the color of the cube to match the light color.
+        cubes.push_back(light_cube);
+    }
 
 	// Prepare the window.
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -352,7 +361,7 @@ void render()
 	// Draw the cubes.
 	for (auto& cube : cubes)
 	{
-		cube->draw(shader_program, active_texture_index);
+		cube->draw(shader_program, static_cast<int>(active_texture_index));
 	}
 
 	// Disable depth testing for UI rendering.
@@ -365,7 +374,7 @@ void render()
 	c_shader_loader::set_mat_4(shader_program, "projection", orthographic_projection);
 	c_shader_loader::set_mat_4(shader_program, "view", glm::mat4(1.0f));      // Set the view matrix to the identity matrix.
 
-	ui_cube->draw(shader_program, active_texture_index);
+	ui_cube->draw(shader_program, static_cast<int>(active_texture_index));
 
 	// Re-enable depth testing.
 	glEnable(GL_DEPTH_TEST);

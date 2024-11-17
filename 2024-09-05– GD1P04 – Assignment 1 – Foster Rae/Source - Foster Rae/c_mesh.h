@@ -31,6 +31,11 @@ public:
 	 *  @param active_texture_index The index of the texture to use.
 	 */
 	void draw(GLuint program_id, int active_texture_index) const;
+	/**
+	 * @brief Sets up the mesh data.
+	 * @note This is called in the constructor.
+	 */
+	void setup_mesh();
 
 	// == Public Members ==
 	GLuint vao; // vao is public.
@@ -40,13 +45,6 @@ public:
 	std::vector<s_texture> textures;
 
 private:
-
-	// == Private Methods ==
-	/**
-	 * @brief Sets up the mesh data.
-	 * @note This is called in the constructor.
-	 */
-	void setup_mesh();
 
 	// == Private Members ==
 	GLuint vbo_, ebo_;

@@ -104,7 +104,17 @@ public:
      * @param shader_program The shader program to update the lights in.
      */
     void update_lights_in_shader(unsigned int shader_program);
+    /**
+     * @brief Update the spotlight with camera position and direction.
+     * @param position The position of the camera.
+     * @param direction The direction the camera is looking.
+     */
     void update_spotlight(const glm::vec3& position, const glm::vec3& direction);
+    /**
+	 * @brief Get the point lights in the scene.
+	 * @return A vector of point lights.
+	 */
+    const std::vector<s_point_light>& get_point_lights() const { return point_lights_; }
 
 private:
 
