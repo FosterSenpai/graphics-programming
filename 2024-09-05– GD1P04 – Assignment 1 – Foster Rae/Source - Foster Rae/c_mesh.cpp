@@ -2,7 +2,7 @@
 #include "c_shader_loader.h"
 
 c_mesh::c_mesh(const std::vector<s_vertex>& vertices, const std::vector<GLuint>& indices, const std::vector<s_texture>& textures)
-	: vertices(vertices), indices(indices), textures(textures){
+	: vertices(vertices), indices(indices), textures(textures) {
 	// Set up the mesh data.
 	setup_mesh();
 }
@@ -50,35 +50,35 @@ void c_mesh::draw(GLuint program_id, int active_texture_index) const
 
 void c_mesh::setup_mesh()
 {
-    // Generate the buffers.
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo_);
-    glGenBuffers(1, &ebo_);
+	// Generate the buffers.
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &vbo_);
+	glGenBuffers(1, &ebo_);
 
-    // Bind the VAO.
-    glBindVertexArray(vao);
+	// Bind the VAO.
+	glBindVertexArray(vao);
 
-    // Bind the VBO and EBO.
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(s_vertex), vertices.data(), GL_STATIC_DRAW);
+	// Bind the VBO and EBO.
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(s_vertex), vertices.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 
-    // Set the vertex attribute pointers.
-    // Vertex Positions.
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(s_vertex), static_cast<void*>(nullptr));
-    // Vertex Normals.
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(s_vertex), reinterpret_cast<void*>(offsetof(s_vertex, normal)));
-    // Vertex Texture Coords.
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(s_vertex), reinterpret_cast<void*>(offsetof(s_vertex, tex_coords)));
-    // Vertex Colors.
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(s_vertex), reinterpret_cast<void*>(offsetof(s_vertex, color)));
+	// Set the vertex attribute pointers.
+	// Vertex Positions.
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(s_vertex), static_cast<void*>(nullptr));
+	// Vertex Normals.
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(s_vertex), reinterpret_cast<void*>(offsetof(s_vertex, normal)));
+	// Vertex Texture Coords.
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(s_vertex), reinterpret_cast<void*>(offsetof(s_vertex, tex_coords)));
+	// Vertex Colors.
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(s_vertex), reinterpret_cast<void*>(offsetof(s_vertex, color)));
 
-    // Unbind the VAO.
-    glBindVertexArray(0);
+	// Unbind the VAO.
+	glBindVertexArray(0);
 }

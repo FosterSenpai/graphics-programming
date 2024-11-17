@@ -45,7 +45,7 @@ void c_shader_loader::set_mat_4(GLuint program, const std::string& name, const g
 
 void c_shader_loader::set_vec_3(GLuint shader_program, const std::string& name, const glm::vec3& value)
 {
-    glUniform3fv(glGetUniformLocation(shader_program, name.c_str()), 1, &value[0]);
+	glUniform3fv(glGetUniformLocation(shader_program, name.c_str()), 1, &value[0]);
 }
 
 // == Private Methods ==
@@ -109,7 +109,7 @@ void c_shader_loader::print_error_details(bool is_shader, GLuint id, const char*
 
 	// Retrieve the log info and populate log variable.
 	(is_shader == true) ? glGetShaderInfoLog(id, info_log_length, nullptr, log.data()) : glGetProgramInfoLog(id, info_log_length, nullptr,
-	                                                                                                  log.data());
+		log.data());
 	std::cout << "Error compiling " << ((is_shader == true) ? "shader" : "program") << ": " << name << '\n';
 	std::cout << log.data() << '\n';
 }

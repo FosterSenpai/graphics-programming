@@ -226,7 +226,7 @@ void c_camera::switch_camera_mode()
 
 void c_camera::zoom(double y_offset)
 {
-    fov_ -= static_cast<float>(y_offset);
-    if (fov_ < 10.0f) fov_ = 10.0f;   // Clamp FOV to a minimum value.
-    if (fov_ > 75.0f) fov_ = 75.0f; // Clamp FOV to a maximum value.
+	fov_ -= static_cast<float>(y_offset);
+	if (fov_ < 10.0f) fov_ = 10.0f;   // Clamp FOV to a minimum value.
+	if (fov_ > 75.0f) fov_ = 75.0f; // Clamp FOV to a maximum value.
 }

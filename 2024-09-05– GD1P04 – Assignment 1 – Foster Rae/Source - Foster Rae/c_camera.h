@@ -48,10 +48,10 @@ public:
 	 */
 	void switch_camera_mode();
 	/**
-     * @brief Adjusts the FOV based on scroll input.
-     * @param y_offset The scroll offset.
-     */
-    void zoom(double y_offset);
+	 * @brief Adjusts the FOV based on scroll input.
+	 * @param y_offset The scroll offset.
+	 */
+	void zoom(double y_offset);
 
 	// == Accessors & Mutators ==
 	void set_position(glm::vec3 position) { position_ = position; }											   // Set the position of the camera.

@@ -11,7 +11,7 @@ void c_graphics_utils::initialize_glfw()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	// Set the number of samples for MSAA.
-    glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
+	glfwWindowHint(GLFW_SAMPLES, 4); // 4x MSAA
 }
 
 int c_graphics_utils::initialize_glew()

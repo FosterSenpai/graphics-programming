@@ -22,7 +22,7 @@ Mail : Foster.Rae@mds.ac.nz
 GLFWwindow* window;
 std::string window_title;
 c_camera camera;
-GLuint vao, vbo, ebo; 
+GLuint vao, vbo, ebo;
 std::vector<c_cube*> cubes;  // Vector of cube objects.
 GLuint shader_program;
 int frame_count = 0;         // Frame count for FPS calculation.
@@ -41,7 +41,7 @@ size_t active_texture_index = 0;   // Index of the active texture.
 GLfloat current_time;
 GLfloat previous_time = 0.0f;
 GLfloat delta_time;
-
+// Light manager & skybox.
 c_light_manager light_manager;
 c_skybox* skybox;
 
@@ -52,7 +52,7 @@ void mouse_callback(GLFWwindow* glfw_window, double x_pos, double y_pos)
 }
 void scroll_callback(GLFWwindow* glfw_window, double x_offset, double y_offset)
 {
-    camera.zoom(y_offset);
+	camera.zoom(y_offset);
 }
 
 // == Function Prototypes ==
@@ -118,14 +118,14 @@ void initial_setup()
 
 	// Set up skybox.
 	std::vector<std::string> faces = {
-	    "Resources/Textures/right.png",
-	    "Resources/Textures/left.png",
-	    "Resources/Textures/top.png",
-	    "Resources/Textures/bottom.png",
-	    "Resources/Textures/front.png",
-	    "Resources/Textures/back.png"
+		"Resources/Textures/right.png",
+		"Resources/Textures/left.png",
+		"Resources/Textures/top.png",
+		"Resources/Textures/bottom.png",
+		"Resources/Textures/front.png",
+		"Resources/Textures/back.png"
 	};
-    skybox = new c_skybox(faces);
+	skybox = new c_skybox(faces);
 
 	// Enable depth testing.
 	glEnable(GL_DEPTH_TEST);
@@ -135,7 +135,7 @@ void initial_setup()
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 	// Enable MSAA.
-    glEnable(GL_MULTISAMPLE);
+	glEnable(GL_MULTISAMPLE);
 
 	// Flip images vertically.
 	stbi_set_flip_vertically_on_load(true);
@@ -147,7 +147,7 @@ void initial_setup()
 	// Set the mouse callback function.
 	glfwSetCursorPosCallback(window, mouse_callback);
 	// Set the scroll callback function.
-    glfwSetScrollCallback(window, scroll_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 
 	// Create the shader program.
 	shader_program = c_shader_loader::create_program("test.vert", "test.frag");
@@ -211,23 +211,23 @@ void initial_setup()
 	ui_cube_scale = glm::vec3(150.0f, 150.0f, 1.0f);
 	ui_cube = new c_cube(textures, ui_cube_position, 0.0f, ui_cube_scale);
 
-    // === SETUP LIGHTS HERE ===
-    // Main directional light.
-    s_directional_light main_dir_light = { glm::normalize(glm::vec3(-20.5f, -20.0f, 15.0f)), glm::vec3(0.8f, 0.8f, 0.8f) };
-    light_manager.set_directional_light(main_dir_light);
+	// === SETUP LIGHTS HERE ===
+	// Main directional light.
+	s_directional_light main_dir_light = { glm::normalize(glm::vec3(-20.5f, -20.0f, 15.0f)), glm::vec3(0.8f, 0.8f, 0.8f) };
+	light_manager.set_directional_light(main_dir_light);
 
-    // Point lights.
-    s_point_light point_light1 = { glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.09f, 0.032f };
-    light_manager.add_point_light(point_light1);
+	// Point lights.
+	s_point_light point_light1 = { glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.09f, 0.032f };
+	light_manager.add_point_light(point_light1);
 
-    s_point_light point_light2 = { glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.09f, 0.032f };
-    light_manager.add_point_light(point_light2);
+	s_point_light point_light2 = { glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.09f, 0.032f };
+	light_manager.add_point_light(point_light2);
 
-    // Spotlight.
-    s_spotlight spot_light = { glm::vec3(0.0f, 0.0f, 0.0f), camera.get_look_dir(),
-        glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)),
-        glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f };
-    light_manager.set_spotlight(spot_light);
+	// Spotlight.
+	s_spotlight spot_light = { glm::vec3(0.0f, 0.0f, 0.0f), camera.get_look_dir(),
+		glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)),
+		glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f };
+	light_manager.set_spotlight(spot_light);
 
 	// Prepare the window.
 	glClearColor(0.56f, 0.57f, 0.60f, 1.0f); // Set the clear color to a light grey.
@@ -250,7 +250,7 @@ void update()
 	process_input(window);
 
 	// Only update the camera if the cursor is hidden.
-	if (!cursor_visible)			   
+	if (!cursor_visible)
 	{
 		camera.update(window, delta_time);
 	}
@@ -261,7 +261,7 @@ void update()
 	}
 
 	// Update spotlight position and direction based on camera.
-    light_manager.update_spotlight(camera.get_position(), camera.get_look_dir());
+	light_manager.update_spotlight(camera.get_position(), camera.get_look_dir());
 
 	// TODO: fix changing back to first texture on second click.
 	// UI cube bounds.
@@ -324,13 +324,13 @@ void render()
 	// ========== START OF RENDERING PIPELINE ==========
 
 	// Draw the skybox.
-    skybox->draw(camera.get_view_matrix(), camera.get_projection_matrix());
+	skybox->draw(camera.get_view_matrix(), camera.get_projection_matrix());
 
 	// Use the shader program.
 	glUseProgram(shader_program);
 
 	// Update lights in shader
-    light_manager.update_lights_in_shader(shader_program, camera.get_position());
+	light_manager.update_lights_in_shader(shader_program, camera.get_position());
 
 	// Pass camera matrices to the shader.
 	c_shader_loader::set_mat_4(shader_program, "projection", camera.get_projection_matrix());
@@ -345,9 +345,6 @@ void render()
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-
-
-	// == DRAW OBJECTS HERE ==;
 
 	// Draw the cubes.
 	for (auto& cube : cubes)
@@ -457,45 +454,45 @@ void process_input(void* glfw_window)
 			}
 		}
 	}
-    // Toggle point lights
-    static bool point_lights_toggle = false;
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !point_lights_toggle)
-    {
-        static bool point_lights_state = true;
-        light_manager.toggle_point_lights(point_lights_state);
-        point_lights_state = !point_lights_state;
-        point_lights_toggle = true;
-    }
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE)
-    {
-        point_lights_toggle = false;
-    }
+	// Toggle point lights
+	static bool point_lights_toggle = false;
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !point_lights_toggle)
+	{
+		static bool point_lights_state = true;
+		light_manager.toggle_point_lights(point_lights_state);
+		point_lights_state = !point_lights_state;
+		point_lights_toggle = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE)
+	{
+		point_lights_toggle = false;
+	}
 
-    // Toggle directional light
-    static bool dir_light_toggle = false;
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !dir_light_toggle)
-    {
-        static bool dir_light_state = true;
-        light_manager.toggle_directional_light(dir_light_state);
-        dir_light_state = !dir_light_state;
-        dir_light_toggle = true;
-    }
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE)
-    {
-        dir_light_toggle = false;
-    }
+	// Toggle directional light
+	static bool dir_light_toggle = false;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !dir_light_toggle)
+	{
+		static bool dir_light_state = true;
+		light_manager.toggle_directional_light(dir_light_state);
+		dir_light_state = !dir_light_state;
+		dir_light_toggle = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE)
+	{
+		dir_light_toggle = false;
+	}
 
-    // Toggle spotlight
-    static bool spot_light_toggle = false;
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !spot_light_toggle)
-    {
-        static bool spot_light_state = true;
-        light_manager.toggle_spotlight(spot_light_state);
-        spot_light_state = !spot_light_state;
-        spot_light_toggle = true;
-    }
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE)
-    {
-        spot_light_toggle = false;
-    }
+	// Toggle spotlight
+	static bool spot_light_toggle = false;
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !spot_light_toggle)
+	{
+		static bool spot_light_state = true;
+		light_manager.toggle_spotlight(spot_light_state);
+		spot_light_state = !spot_light_state;
+		spot_light_toggle = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE)
+	{
+		spot_light_toggle = false;
+	}
 }
